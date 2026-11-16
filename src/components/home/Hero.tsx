@@ -342,7 +342,7 @@ export function Hero() {
             >
               <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/35 to-transparent" />
               <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white shadow-lg">
-                <LinkedInIcon size={22} />
+                <LinkedInIcon className="h-[22px] w-[22px]" />
               </div>
             </div>
 

@@ -11,7 +11,7 @@ import {
   Sparkles,
   TrendingUp,
   ShieldCheck,
-  Linkedin,
+  
   BadgeCheck,
   Eye,
   BriefcaseBusiness,
@@ -315,7 +315,7 @@ export function Hero1() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#19133d]/30 to-transparent" />
 
                 <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A66C2] text-white shadow-lg">
-                  <LinkedInIcon size={22} fill="white" />
+                  {/* <LinkedInIcon  fill="white" /> */}
                 </div>
               </div>
 
