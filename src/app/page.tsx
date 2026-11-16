@@ -14,6 +14,7 @@ import { Team } from "@/components/home/Team";
 import { PressRelease } from "@/components/home/PressRelease";
 import { CTA } from "@/components/home/CTA";
 import { FAQ } from "@/components/home/FAQ";
+import FavikonCounter from "@/components/home/Favikon";
 
 export default function Home() {
   return (
@@ -29,6 +30,7 @@ export default function Home() {
 
       {/* ── 04. Top Clients & Recognition ── */}
       <ClientRecognition />
+      <FavikonCounter/>
 
       {/* ── 05. Testimonials Slider ── */}
       <Testimonials />

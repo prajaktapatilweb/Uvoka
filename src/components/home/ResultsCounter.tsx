@@ -5,10 +5,10 @@ import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { AnimatedCard } from "@/components/animations/AnimatedCard";
 
 const STAT_ACCENTS = [
-  "bg-primary",
-  "bg-primary-dark",
-  "bg-primary-muted",
-  "bg-gold",
+  "text-primary",
+  "text-primary-dark",
+  "text-primary-muted",
+  "text-gold",
 ];
 
 export function ResultsCounter() {
@@ -46,11 +46,17 @@ export function ResultsCounter() {
               </div>
 
               <div className="relative my-0 mr-0 w-24 shrink-0 sm:w-32">
-                <div
+                <svg
                   aria-hidden="true"
-                  className={`absolute inset-0 ${STAT_ACCENTS[idx % STAT_ACCENTS.length]}`}
-                  style={{ clipPath: "ellipse(100% 100% at 100% 50%)" }}
-                />
+                  viewBox="0 0 200 100"
+                  preserveAspectRatio="none"
+                  className={`absolute -left-full top-0 h-full w-[200%] overflow-visible ${STAT_ACCENTS[idx % STAT_ACCENTS.length]}`}
+                >
+                  <path
+                    d="M 166 0 C 158 12, 148 17, 137 20 C 122 24, 126 36, 111 42 C 100 47, 88 47, 78 54 C 66 62, 77 70, 84 78 C 92 87, 78 95, 70 100 L 200 100 L 200 0 Z"
+                    fill="currentColor"
+                  />
+                </svg>
                 <div className="absolute left-0 top-1/2 z-10 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white px-1 text-center text-primary shadow-[0_3px_10px_rgba(39,35,42,0.18)] sm:h-24 sm:w-24">
                   <AnimatedCounter
                     value={stat.value}
