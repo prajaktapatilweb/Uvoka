@@ -4,7 +4,6 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Container } from "@/components/common/Container";
-import { Button } from "@/components/common/Button";
 
 const featuredLogos = [
   {
@@ -31,23 +30,34 @@ export function FeaturedIn() {
     <section
       id="featured-section"
       aria-labelledby="featured-heading"
-      className="border-y border-[var(--color-border)] bg-[var(--color-ivory)] py-10 md:py-14"
+      className="relative overflow-hidden bg-bg-dark py-12 text-white md:py-16"
     >
-      <Container className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(190px,0.7fr)_1.3fr] md:gap-12">
+      {/* soft glow, same family as the hero's curved shape */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-32 -top-32 h-[380px] w-[380px] rounded-full bg-primary/20 blur-3xl"
+      />
+      {/* thin gold line along the top edge */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent"
+      />
+
+      <Container className="relative grid grid-cols-1 items-center gap-10 md:grid-cols-[minmax(220px,0.7fr)_1.3fr] md:gap-14">
         <div>
           <h2
             id="featured-heading"
-            className="font-heading text-3xl font-bold text-[var(--color-charcoal)] md:text-4xl"
+            className="font-heading text-3xl font-semibold tracking-tight text-white md:text-5xl" style={{ color: "white" }}
           >
             As Featured In
           </h2>
-          <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+          <p className="mt-3 font-serif text-lg italic text-gold md:text-xl">
             Recognized by leading publications
           </p>
         </div>
 
         <motion.ul
-          className="grid grid-cols-2 items-stretch gap-x-6 gap-y-8 md:grid-cols-3 md:gap-x-8"
+          className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 md:gap-6"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
@@ -59,35 +69,35 @@ export function FeaturedIn() {
           {featuredLogos.map((logo) => (
             <motion.li
               key={logo.src}
-              className="flex min-w-0 flex-col items-center text-center"
+              className="min-w-0"
               variants={{
                 hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 12 },
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: shouldReduceMotion ? 0.01 : 0.55, ease: "easeOut" }}
             >
-              <div className="relative h-24 w-full rounded-sm bg-white p-5 shadow-[var(--shadow-sm)]">
-                <a href={logo.href} target="_blank" rel="noopener noreferrer">
+              {/* The whole white plate is the link, not just the logo */}
+              <a
+                href={logo.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative block h-24 w-full rounded-xl bg-white p-5 shadow-lg ring-1 ring-white/10 transition duration-300 hover:-translate-y-1 hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              >
                 <Image
                   src={logo.src}
                   alt={logo.alt}
                   fill
                   sizes="(max-width: 767px) 40vw, 15vw"
-                  className="object-contain"
+                  className="object-contain p-5"
                 />
-                </a>
-              </div>
-           
-              {/* <Button
-                href={logo.href}
-                isExternal
-                variant="primary"
-                size="sm"
-                // icon={<ArrowUpRight aria-hidden="true" className="h-4 w-4" />}
-                className="mt-4 self-center text-[15px] focus-visible:outline-[var(--color-primary)]"
-              >
-                Read article
-              </Button> */}
+                <span
+                  aria-hidden="true"
+                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-gold text-bg-dark opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                >
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </span>
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
             </motion.li>
           ))}
         </motion.ul>

@@ -27,16 +27,21 @@ export default function Home() {
 
       {/* ── 03. Counter Results / Achievements ── */}
       <ResultsCounter />
+      <FavikonCounter />
 
+      {/* ── 06. Services -- Five Creative Animated Cards ── */}
+      <Services />
+
+      {/* ── 09. How We Work -- Interactive Journey Map ── */}
+      <JourneyMap />
       {/* ── 04. Top Clients & Recognition ── */}
       <ClientRecognition />
-      <FavikonCounter/>
+
 
       {/* ── 05. Testimonials Slider ── */}
       <Testimonials />
 
-      {/* ── 06. Services -- Five Creative Animated Cards ── */}
-      <Services />
+
 
       {/* ── 07. Current Package / Special Discount Offer ── */}
       <SpecialOffer />
@@ -44,11 +49,13 @@ export default function Home() {
       {/* ── 08. Add-ons ── */}
       <AddOns />
 
-      {/* ── 09. How We Work -- Interactive Journey Map ── */}
-      <JourneyMap />
+
 
       {/* ── 10. About Us -- Company Story, Media & Awards ── */}
       <AboutPreview />
+
+      {/* ── 13. Our Team -- Creative Team Showcase ── */}
+      <Team />
 
       {/* ── 11. Blogs -- Dynamic Sanity CMS Integration Preview ── */}
       <BlogsPreview />
@@ -56,17 +63,15 @@ export default function Home() {
       {/* ── 12. Resources & Tools ── */}
       <Resources />
 
-      {/* ── 13. Our Team -- Creative Team Showcase ── */}
-      <Team />
+
 
       {/* ── 14. Press Releases ── */}
       <PressRelease />
+      {/* ── 16. FAQ Accordion ── */}
+      <FAQ />
 
       {/* ── 15. Call to Action ── */}
       <CTA />
-
-      {/* ── 16. FAQ Accordion ── */}
-      <FAQ />
 
       {/* (17. Footer is permanently anchored in RootLayout) */}
     </div>

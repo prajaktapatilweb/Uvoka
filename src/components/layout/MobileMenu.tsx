@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Mail } from "lucide-react";
-import { NAV_LINKS, SITE_CONFIG } from "@/lib/constants";
+import { X, ArrowRight, Mail, ChevronDown } from "lucide-react";
+import { NAV_LINKS, SERVICES, SITE_CONFIG } from "@/lib/constants";
 import { Button } from "@/components/common/Button";
 import { LinkedInIcon, InstagramIcon, TwitterXIcon } from "@/components/common/Icons";
 
@@ -18,6 +18,7 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
+  const [isServicesOpen, setIsServicesOpen] = useState(pathname.startsWith("/services/"));
 
   // Prevent background scroll when mobile menu is open
   useEffect(() => {
@@ -34,6 +35,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   // Close on route change
   useEffect(() => {
     onClose();
+    setIsServicesOpen(pathname.startsWith("/services/"));
   }, [pathname, onClose]);
 
   return (
@@ -84,7 +86,67 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {/* Navigation Links */}
             <nav className="my-auto py-6 space-y-2">
               {NAV_LINKS.map((link, idx) => {
-                const isActive = pathname === link.href;
+                const isActive = link.href === "/services"
+                  ? pathname.startsWith("/services")
+                  : pathname === link.href;
+
+                if (link.href === "/services") {
+                  return (
+                    <motion.div
+                      key={link.href}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 * idx, duration: 0.3 }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href="/services"
+                          onClick={onClose}
+                          className={`flex flex-1 items-center justify-between rounded-xl px-4 py-3 font-heading text-lg font-medium transition-all ${
+                            isActive
+                              ? "bg-[var(--color-ivory)] pl-5 font-bold text-[var(--color-primary)]"
+                              : "text-[var(--color-charcoal)] hover:bg-[var(--color-ivory)]/50 hover:pl-5"
+                          }`}
+                        >
+                          <span>Services</span>
+                          <ArrowRight aria-hidden="true" className="h-4 w-4 opacity-40" />
+                        </Link>
+                        <button
+                          type="button"
+                          aria-label="Toggle service links"
+                          aria-expanded={isServicesOpen}
+                          aria-controls="mobile-services-menu"
+                          onClick={() => setIsServicesOpen((open) => !open)}
+                          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[var(--color-primary)] transition-colors hover:bg-[var(--color-ivory)] focus-visible:outline-2"
+                        >
+                          <ChevronDown
+                            aria-hidden="true"
+                            className={`h-5 w-5 transition-transform ${isServicesOpen ? "rotate-180" : ""}`}
+                          />
+                        </button>
+                      </div>
+                      {isServicesOpen && (
+                        <div id="mobile-services-menu" className="ml-4 mt-1 space-y-1 border-l border-[var(--color-border)] pl-3">
+                          {SERVICES.map((service) => (
+                            <Link
+                              key={service.id}
+                              href={`/services/${service.slug}` as Route}
+                              onClick={onClose}
+                              className={`block rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                                pathname === `/services/${service.slug}`
+                                  ? "bg-[var(--color-ivory)] font-semibold text-[var(--color-primary)]"
+                                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-ivory)]/60 hover:text-[var(--color-primary)]"
+                              }`}
+                            >
+                              {service.title.replace(/\s*\[Placeholder\]/, "")}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                }
+
                 return (
                   <motion.div
                     key={link.href}

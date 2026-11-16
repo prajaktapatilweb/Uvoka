@@ -85,7 +85,7 @@ export default function FavikonCounter() {
                   </motion.div>
                 </div>
 
-                <p className="mt-4 text-sm text-white/80" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{stat.note}</p>
+                <p className="mt-4 text-sm text-white/80">{stat.note}</p>
               </dd>
             </div>
           ))}
