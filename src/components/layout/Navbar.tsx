@@ -7,7 +7,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, ArrowRight, ChevronDown } from "lucide-react";
 import { NAV_LINKS, SERVICES, SITE_CONFIG } from "@/lib/constants";
-import { Button } from "@/components/common/Button";
 import { MobileMenu } from "./MobileMenu";
 
 export function Navbar() {
@@ -50,30 +49,31 @@ export function Navbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled
-            ? "border-b border-[var(--color-border)] bg-white/90 py-3 shadow-xs backdrop-blur-md"
+            ? "border-b border-[var(--color-border)] bg-white/90 py-1.5 shadow-xs backdrop-blur-md"
             : "bg-transparent py-5"
         }`}
       >
         {/* Full-width wrapper (no Container). Left padding lines up with the hero text */}
-        <div className="flex w-full items-center justify-between px-5 sm:px-10 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:px-16">
+        <div className="flex w-full items-center justify-between px-5 sm:px-8 lg:px-10 xl:px-16">
           {/* Logo Brand */}
           <Link
             href="/"
-            className="group flex items-center gap-3 justify-self-start rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2"
+            className={`group flex items-center gap-0 justify-self-start rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-300 ${isScrolled ? "h-14" : "h-11"}`}
           >
-            <div className="relative h-11 w-11 overflow-hidden rounded-full border border-white/30 bg-white p-1 transition-transform duration-300 group-hover:scale-105">
+            <div className={`relative shrink-0 transition-all duration-300 group-hover:scale-105 ${isScrolled ? "h-14 w-14" : "h-11 w-11"}`}>
               <Image
-                src="/logo/logo1.png"
+                src={isScrolled ? "/images/uvokalogo2.png" : "/images/uvokalogo1.png"}
                 alt="UVOKA Logo"
-                fill
-                sizes="44px"
-                className="object-contain"
+                width={isScrolled ? 120 : 44}
+                height={isScrolled ? 120 : 44}
+                sizes={isScrolled ? "120px" : "44px"}
+                className={isScrolled ? "absolute left-0 top-0 max-w-none object-contain" : "object-contain"}
                 priority
               />
             </div>
-            <div className="flex flex-col leading-tight">
+            <div className={`h-11 items-center ${isScrolled ? "hidden" : "flex"}`}>
               <span
-                className={`font-heading text-2xl font-bold tracking-tight transition-colors duration-300 ${
+                className={`font-heading text-2xl leading-11 font-bold tracking-tight transition-colors duration-300 ${
                   isHeroOverlay
                     ? "text-white"
                     : "text-[var(--color-primary)] group-hover:text-[var(--color-primary-dark)]"
@@ -81,23 +81,17 @@ export function Navbar() {
               >
                 {SITE_CONFIG.name}
               </span>
-              <span
-                className={`hidden text-[10px] font-mono uppercase tracking-widest sm:block ${
-                  isHeroOverlay ? "text-white/70" : "text-[var(--color-text-muted)]"
-                }`}
-              >
-                Agency
-              </span>
+            
             </div>
           </Link>
 
           {/* Desktop Navigation: sits in a solid pill so it stays readable on the dark and light halves of the hero */}
           <nav
             aria-label="Main"
-            className={`hidden items-center gap-1 rounded-full p-1.5 transition-all duration-300 lg:flex ${
+            className={`hidden items-center gap-1 rounded-full p-1.5 transition-all duration-300 xl:ml-auto xl:flex ${
               isHeroOverlay
-                ? "bg-[var(--color-primary-dark)]/85 shadow-lg ring-1 ring-white/15 backdrop-blur-md"
-                : ""
+                ? "border border-gold bg-[var(--color-primary-dark)]/85 shadow-lg ring-1 ring-white/15 backdrop-blur-md"
+                : "border-0 shadow-none"
             }`}
           >
             {NAV_LINKS.map((link) => {
@@ -187,23 +181,13 @@ export function Navbar() {
           </nav>
 
           {/* Right Action / CTA & Mobile Toggle */}
-          <div className="flex items-center gap-3 lg:justify-self-end">
-            <Button
-              href="/contact"
-              variant={isHeroOverlay ? "gold" : "primary"}
-              size="md"
-              icon={<ArrowRight className="h-4 w-4" />}
-              className="hidden sm:inline-flex"
-            >
-              Enquire Now
-            </Button>
-
+          <div className="flex items-center gap-3 xl:justify-self-end">
             {/* Mobile Hamburger Toggle */}
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open mobile navigation menu"
-              className={`flex h-11 w-11 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 lg:hidden ${
+              className={`flex h-11 w-11 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 xl:hidden ${
                 isHeroOverlay
                   ? "border-white/30 text-white hover:bg-white/10"
                   : "border-[var(--color-border)] text-[var(--color-charcoal)] hover:bg-[var(--color-ivory)]"

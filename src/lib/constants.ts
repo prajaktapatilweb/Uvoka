@@ -13,6 +13,7 @@ export const SITE_CONFIG = {
 } as const;
 
 export const NAV_LINKS = [
+  { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Founder", href: "/founder" },
   { label: "Services", href: "/services" },

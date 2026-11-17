@@ -1,414 +1,385 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { MotionPathPlugin } from "gsap/MotionPathPlugin";
-import { CheckCircle2, Sparkles, Compass } from "lucide-react";
-import { JOURNEY_STAGES } from "@/data/homeData";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import {
+  Phone,
+  UserCog,
+  Layers,
+  CalendarDays,
+  MessageSquareText,
+  BarChart3,
+} from "lucide-react";
 import { Container } from "@/components/common/Container";
-import { SectionHeading } from "@/components/common/SectionHeading";
-import { Badge } from "@/components/common/Badge";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
-}
+// Put the white logo file at /public/logo/uvoka-icon-white.png
+const LOGO_SRC = "/images/uvoka-icon.png";
+const AUTOPLAY_MS = 6000;
 
-// Normalized progress milestones along the path (0 to 1)
-const MILESTONE_POSITIONS = [0.03, 0.22, 0.42, 0.62, 0.81, 0.97];
-
-// Exact SVG coordinates for the 6 nodes on wave:
-// M 60,110 C 260,30 380,190 580,110 C 780,30 900,190 1140,110
-const NODE_COORDINATES = [
-  { x: 60, y: 110 },
-  { x: 260, y: 55 },
-  { x: 470, y: 165 },
-  { x: 690, y: 55 },
-  { x: 900, y: 165 },
-  { x: 1140, y: 110 },
+const steps = [
+  {
+    icon: Phone,
+    title: "Onboarding Call",
+    text: "We ask you 50-60 questions about your personal and professional life to help us get into your shoes and understand your stories.",
+  },
+  {
+    icon: UserCog,
+    title: "Profile Optimization",
+    text: "Our team will then work on your headline, bio, banner etc and give you, your optimisation in the next 24 hours.",
+  },
+  {
+    icon: Layers,
+    title: "Content Pillars",
+    text: "We use frameworks like TOFU, MOFU, BOFU to give you the perfect mix of topics that you will love.",
+  },
+  {
+    icon: CalendarDays,
+    title: "Content Calendar",
+    text: "We share a notion board with you with content every Monday. Which means 0 follow ups. Only 15-20 mins of your time to approve content.",
+  },
+  {
+    icon: MessageSquareText,
+    title: "Graphics Approval",
+    text: "To communicate with you in real-time & churn content as per your requirements, we create a WhatsApp/slack group to communicate with you faster.",
+  },
+  {
+    icon: BarChart3,
+    title: "Progress Report",
+    text: "We track your progress weekly to understand what's working & then deep dive every month to give you a detailed analysis.",
+  },
 ];
 
+/* ---- Desktop path geometry (viewBox units; nodes are placed by % of this box) ---- */
+const VB_W = 1200;
+const VB_H = 440;
+const LOW = 290;
+const HIGH = 150;
+const points = steps.map((_, i) => ({
+  x: 100 + i * 200,
+  y: i % 2 === 0 ? LOW : HIGH,
+}));
+
+const pathD = points.reduce((d, p, i) => {
+  if (i === 0) return `M ${p.x} ${p.y}`;
+  const prev = points[i - 1];
+  const mid = (p.x - prev.x) / 2;
+  return `${d} C ${prev.x + mid} ${prev.y}, ${p.x - mid} ${p.y}, ${p.x} ${p.y}`;
+}, "");
+
 export function JourneyMap() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const stickyRef = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
-  const progressPathRef = useRef<SVGPathElement>(null);
-  const logoNodeRef = useRef<SVGGElement>(null);
   const reduced = useReducedMotion();
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const pathRef = useRef<SVGPathElement>(null);
 
-  const [activeStageIndex, setActiveStageIndex] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  // 0 → 1 along the whole wave. Drives the gold line AND the logo position
+  const travel = useMotionValue(0);
 
-  useLayoutEffect(() => {
-    if (reduced || !containerRef.current || !stickyRef.current) return;
+  const pointAt = (v: number) => {
+    const el = pathRef.current;
+    if (!el) return points[0];
+    return el.getPointAtLength(v * el.getTotalLength());
+  };
+  const logoLeft = useTransform(travel, (v) => `${(pointAt(v).x / VB_W) * 100}%`);
+  const logoTop = useTransform(travel, (v) => `${(pointAt(v).y / VB_H) * 100}%`);
 
-    // Only create pinned scroll sequence on desktop/tablet (>=768px)
-    if (window.innerWidth < 768) return;
+  // move the logo along the curve whenever the step changes
+  useEffect(() => {
+    const target = active / (steps.length - 1);
+    if (reduced) {
+      travel.set(target);
+      return;
+    }
+    const controls = animate(travel, target, {
+      duration: 1.2,
+      ease: [0.22, 1, 0.36, 1],
+    });
+    return () => controls.stop();
+  }, [active, reduced, travel]);
 
-    const ctx = gsap.context(() => {
-      const path = pathRef.current;
-      const progressPath = progressPathRef.current;
-      const logoNode = logoNodeRef.current;
-
-      if (!path || !progressPath || !logoNode) return;
-
-      const pathLength = path.getTotalLength();
-      gsap.set(progressPath, {
-        strokeDasharray: pathLength,
-        strokeDashoffset: pathLength,
-      });
-
-      // Master Pinned Scroll Timeline
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "+=2000",
-          pin: true,
-          scrub: 1.1,
-          anticipatePin: 1,
-          onUpdate: (self) => {
-            const p = self.progress;
-            setScrollProgress(p);
-
-            // Determine active milestone index based on scroll position
-            let activeIdx = 0;
-            for (let i = 0; i < MILESTONE_POSITIONS.length; i++) {
-              if (p >= MILESTONE_POSITIONS[i] - 0.08) {
-                activeIdx = i;
-              }
-            }
-            setActiveStageIndex(activeIdx);
-          },
-        },
-      });
-
-      // 1. Draw the golden progress wave line matching scroll
-      tl.to(
-        progressPath,
-        {
-          strokeDashoffset: 0,
-          ease: "none",
-        },
-        0
-      );
-
-      // 2. Animate traveling golden seal logo along the wave path
-      tl.to(
-        logoNode,
-        {
-          motionPath: {
-            path: path,
-            align: path,
-            alignOrigin: [0.5, 0.5],
-            autoRotate: false,
-          },
-          ease: "none",
-        },
-        0
-      );
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [reduced]);
-
-  const activeStage = JOURNEY_STAGES[activeStageIndex];
+  // autoplay (re-keyed on `active`, so a manual click restarts the timer)
+  useEffect(() => {
+    if (paused || reduced) return;
+    const t = setTimeout(() => setActive((a) => (a + 1) % steps.length), AUTOPLAY_MS);
+    return () => clearTimeout(t);
+  }, [active, paused, reduced]);
 
   return (
     <section
-      id="how-we-work"
-      className="bg-gradient-to-b from-[var(--color-white)] via-[var(--color-ivory)]/35 to-[var(--color-white)] border-t border-[var(--color-border)] relative overflow-hidden"
+      id="journey"
+      aria-labelledby="journey-heading"
+      className="relative isolate overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-bg-dark py-20 text-white md:py-28"
     >
-      {/* Ambient background lighting */}
       <div
-        className="absolute top-1/4 left-1/4 w-[36rem] h-[36rem] rounded-full bg-[var(--color-primary)]/5 blur-3xl pointer-events-none"
         aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-1/4 right-1/4 w-[32rem] h-[32rem] rounded-full bg-[var(--color-gold)]/10 blur-3xl pointer-events-none"
-        aria-hidden="true"
+        className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[520px] w-[520px] rounded-full bg-primary-muted/25 blur-[110px]"
       />
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          DESKTOP PINNED SCROLL JOURNEY (>= 768px)
-          ═══════════════════════════════════════════════════════════════════════ */}
-      <div
-        ref={containerRef}
-        className="hidden md:block relative"
-        style={{ height: "260vh" }}
-      >
-        <div
-          ref={stickyRef}
-          className="sticky top-0 h-screen flex flex-col justify-between py-12 overflow-hidden"
-        >
-          <Container className="flex-1 flex flex-col justify-between max-w-6xl">
-            {/* Header with Editorial Styling */}
-            <div className="flex flex-col items-center text-center">
-              <SectionHeading
-                eyebrow="Our Methodology"
-                title="The Interactive Client Journey Map"
-                italicPhrase="Journey Map"
-                subtitle="A connected 6-stage storytelling architecture engineered to transition founders from discovery to consistent executive category dominance."
-                className="mb-4"
-              />
-
-              {/* Minimalist Milestone Indicator Strip */}
-              <div className="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-[var(--color-border)] shadow-xs">
-                <Compass className="w-3.5 h-3.5 text-[var(--color-primary)] animate-spin-slow" />
-                <div className="flex items-center gap-1.5">
-                  {JOURNEY_STAGES.map((stg, i) => {
-                    const isPassed = activeStageIndex >= i;
-                    const isCurrent = activeStageIndex === i;
-
-                    return (
-                      <div
-                        key={stg.step}
-                        className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono transition-all duration-300 flex items-center gap-1 ${
-                          isCurrent
-                            ? "bg-[var(--color-primary)] text-white font-bold shadow-xs scale-105"
-                            : isPassed
-                            ? "bg-[var(--color-gold)]/20 text-[var(--color-primary)] font-semibold"
-                            : "text-[var(--color-text-muted)]"
-                        }`}
-                      >
-                        <span>{stg.step}</span>
-                        {isCurrent && <span className="w-1 h-1 rounded-full bg-[var(--color-gold)]" />}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Curving SVG Wave Path with GSAP MotionPath Golden Traveler */}
-            <div className="relative my-4 w-full">
-              <svg
-                viewBox="0 0 1200 220"
-                className="w-full h-32 overflow-visible"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <defs>
-                  {/* Luxury Metallic Gradient */}
-                  <linearGradient id="journeyGoldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="var(--color-primary)" />
-                    <stop offset="35%" stopColor="var(--color-gold)" />
-                    <stop offset="70%" stopColor="#e8cf9b" />
-                    <stop offset="100%" stopColor="var(--color-primary)" />
-                  </linearGradient>
-
-                  {/* Node Glow Filter */}
-                  <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="rgba(210, 185, 139, 0.45)" />
-                  </filter>
-                </defs>
-
-                {/* Base Guide Track (Dotted) */}
-                <path
-                  ref={pathRef}
-                  id="journey-wave-track"
-                  d="M 60,110 C 260,30 380,190 580,110 C 780,30 900,190 1140,110"
-                  stroke="rgba(82, 33, 102, 0.15)"
-                  strokeWidth="3"
-                  strokeDasharray="6 6"
-                />
-
-                {/* Animated Gold Progress Track (Drawn by Scroll) */}
-                <path
-                  ref={progressPathRef}
-                  id="journey-wave-progress"
-                  d="M 60,110 C 260,30 380,190 580,110 C 780,30 900,190 1140,110"
-                  stroke="url(#journeyGoldGradient)"
-                  strokeWidth="4.5"
-                  strokeLinecap="round"
-                />
-
-                {/* 6 Milestone Nodes on the Wave */}
-                {NODE_COORDINATES.map((coords, idx) => {
-                  const isNodeActive = activeStageIndex === idx;
-                  const isPassed = activeStageIndex >= idx;
-
-                  return (
-                    <g key={idx} className="transition-all duration-300">
-                      {/* Pulse ring for active milestone */}
-                      {isNodeActive && (
-                        <circle
-                          cx={coords.x}
-                          cy={coords.y}
-                          r="22"
-                          stroke="var(--color-gold)"
-                          strokeWidth="2"
-                          fill="none"
-                          className="animate-ping opacity-60"
-                        />
-                      )}
-
-                      {/* Milestone outer circle */}
-                      <circle
-                        cx={coords.x}
-                        cy={coords.y}
-                        r={isNodeActive ? 15 : 10}
-                        fill={isPassed ? "var(--color-primary)" : "white"}
-                        stroke={isNodeActive ? "var(--color-gold)" : "var(--color-primary)"}
-                        strokeWidth={isNodeActive ? 4 : 2}
-                        filter={isNodeActive ? "url(#nodeGlow)" : undefined}
-                        className="transition-all duration-300"
-                      />
-
-                      {/* Center dot */}
-                      <circle
-                        cx={coords.x}
-                        cy={coords.y}
-                        r={isNodeActive ? 5 : 3}
-                        fill={isPassed ? "var(--color-gold)" : "var(--color-primary)"}
-                        className="transition-all duration-300"
-                      />
-                    </g>
-                  );
-                })}
-
-                {/* Traveling UVOKA Golden Seal (MotionPath Driven by GSAP) */}
-                <g ref={logoNodeRef} id="traveling-seal" className="cursor-pointer">
-                  <circle
-                    cx="0"
-                    cy="0"
-                    r="24"
-                    fill="white"
-                    stroke="var(--color-gold)"
-                    strokeWidth="3"
-                    filter="url(#nodeGlow)"
-                  />
-                  <image
-                    href="/logo/journeylogo.png"
-                    width="36"
-                    height="36"
-                    x="-18"
-                    y="-18"
-                    preserveAspectRatio="xMidYMid meet"
-                  />
-                </g>
-              </svg>
-            </div>
-
-            {/* Dynamic Stage Details Card (Reveals Smoothly as User Scrolls) */}
-            <div className="relative w-full max-w-4xl mx-auto mb-4">
-              <div className="relative rounded-3xl border border-[var(--color-primary)]/30 bg-white/90 backdrop-blur-xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(82,33,102,0.1)] transition-all duration-500 overflow-hidden">
-                {/* Top Metallic Gold Accent Bar */}
-                <div
-                  className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-gold)] to-[var(--color-primary)]"
-                  aria-hidden="true"
-                />
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                  {/* Left Column (7 cols): Stage Narrative */}
-                  <div className="lg:col-span-7 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-bold px-3 py-1 rounded-md bg-[var(--color-primary)] text-white shadow-xs">
-                        STAGE {activeStage.step}
-                      </span>
-                      <Badge variant="gold" size="sm" className="font-mono text-xs">
-                        {activeStage.timeline}
-                      </Badge>
-                      <span className="text-xs text-[var(--color-text-muted)] font-mono">
-                        • {activeStage.tagline}
-                      </span>
-                    </div>
-
-                    <h3 className="font-heading font-extrabold text-2xl sm:text-3xl text-[var(--color-charcoal)] leading-snug">
-                      {activeStage.title}
-                    </h3>
-
-                    <p className="text-sm sm:text-base text-[var(--color-text-secondary)] leading-relaxed">
-                      {activeStage.description}
-                    </p>
-                  </div>
-
-                  {/* Right Column (5 cols): Key Deliverables */}
-                  <div className="lg:col-span-5 bg-[var(--color-ivory)]/60 rounded-2xl p-6 border border-[var(--color-border)] space-y-3">
-                    <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-primary)] flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[var(--color-gold)]" />
-                      Core Deliverables
-                    </h4>
-
-                    <div className="space-y-2.5">
-                      {activeStage.deliverables.map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5">
-                          <CheckCircle2 className="w-4 h-4 text-[var(--color-primary)] shrink-0 mt-0.5" />
-                          <span className="text-xs font-medium text-[var(--color-charcoal)] leading-snug">
-                            {item}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress Cue Bottom Bar */}
-                <div className="mt-6 pt-4 border-t border-[var(--color-border)]/60 flex items-center justify-between text-xs font-mono text-[var(--color-text-muted)]">
-                  <span>Scroll to navigate methodology</span>
-                  <span className="text-[var(--color-primary)] font-bold">
-                    {Math.round(scrollProgress * 100)}% Complete
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Container>
+      <Container>
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/[0.07] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md">
+            <span className="h-2 w-2 rounded-full bg-gold" />
+            Our Process
+          </span>
+          <h2
+            id="journey-heading"
+            className="mt-6 font-heading text-4xl font-extrabold leading-[1.1] tracking-tight !text-white md:text-5xl"
+          >
+            Your journey to{" "}
+            <span className="font-editorial font-normal italic text-gold">
+              category authority
+            </span>
+          </h2>
         </div>
-      </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          MOBILE VERTICAL TIMELINE (< 768px)
-          ═══════════════════════════════════════════════════════════════════════ */}
-      <div className="md:hidden py-16">
-        <Container>
-          <SectionHeading
-            eyebrow="Our Methodology"
-            title="The 6-Stage Client Journey"
-            italicPhrase="Client Journey"
-            subtitle="Engineered to transition founders from discovery to consistent executive category dominance."
-            className="mb-10 text-left items-start"
-          />
+        {/* ================= DESKTOP: logo travels along the wave ================= */}
+        <div
+          className="relative mx-auto mt-16 hidden w-full max-w-[1200px] lg:block"
+          style={{ aspectRatio: `${VB_W} / ${VB_H}` }}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          <svg
+            aria-hidden="true"
+            viewBox={`0 0 ${VB_W} ${VB_H}`}
+            preserveAspectRatio="none"
+            className="absolute inset-0 h-full w-full overflow-visible"
+          >
+            <path
+              ref={pathRef}
+              d={pathD}
+              fill="none"
+              stroke="white"
+              strokeOpacity="0.2"
+              strokeWidth="3"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <motion.path
+              d={pathD}
+              fill="none"
+              stroke="var(--color-gold)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              style={{ pathLength: travel }}
+            />
+          </svg>
 
-          <div className="relative pl-6 border-l-2 border-[var(--color-gold)]/40 space-y-8">
-            {JOURNEY_STAGES.map((stage) => (
-              <div
-                key={stage.step}
-                className="relative bg-white/90 backdrop-blur-md rounded-2xl border border-[var(--color-border)] p-6 shadow-sm space-y-3"
-              >
-                {/* Node circle on the vertical line */}
-                <div className="absolute -left-[31px] top-6 w-4 h-4 rounded-full bg-[var(--color-primary)] border-2 border-white shadow-xs" />
+          {/* the travelling logo */}
+          <motion.div
+            aria-hidden="true"
+            className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2"
+            style={{ left: logoLeft, top: logoTop }}
+          >
+            <span className="absolute inset-0 rounded-full bg-gold/40 motion-safe:animate-ping" />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-gold bg-primary-dark shadow-[0_0_0_8px_rgba(255,255,255,0.08)]">
+              <Image
+                src={LOGO_SRC}
+                alt=""
+                width={40}
+                height={40}
+                className="h-9 w-9 object-contain"
+              />
+              <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-gold text-xs font-bold text-bg-dark">
+                {active + 1}
+              </span>
+            </div>
+          </motion.div>
 
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-[var(--color-primary)] text-white">
-                    STAGE {stage.step}
-                  </span>
-                  <span className="text-xs font-mono text-[var(--color-gold)] font-bold">
-                    {stage.timeline}
-                  </span>
-                </div>
+          {steps.map((s, i) => {
+            const p = points[i];
+            const isActive = i === active;
+            const isDone = i <= active;
+            const below = p.y === HIGH; // high nodes: card opens below, low nodes: above
+            const shift = i === 0 ? "-15%" : i === steps.length - 1 ? "-85%" : "-50%";
+            const Icon = s.icon;
 
-                <h3 className="font-heading font-bold text-lg text-[var(--color-charcoal)]">
-                  {stage.title}
-                </h3>
+            return (
+              <div key={s.title}>
+                {/* stop on the path */}
+                <button
+                  type="button"
+                  onClick={() => setActive(i)}
+                  aria-label={`Step ${i + 1}: ${s.title}`}
+                  aria-current={isActive ? "step" : undefined}
+                  className="absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-full p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                  style={{
+                    left: `${(p.x / VB_W) * 100}%`,
+                    top: `${(p.y / VB_H) * 100}%`,
+                  }}
+                >
+                  <span
+                    className={`block h-4 w-4 rounded-full border-2 transition-colors duration-500 ${
+                      isDone
+                        ? "border-gold bg-gold"
+                        : "border-white/60 bg-primary-dark"
+                    }`}
+                  />
+                </button>
 
-                <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                  {stage.description}
-                </p>
+                {/* idle label (hidden while its card is open) */}
+                {!isActive && (
+                  <button
+                    type="button"
+                    onClick={() => setActive(i)}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="absolute w-36 -translate-x-1/2 text-center text-sm font-medium text-white/70 transition-colors hover:text-white"
+                    style={{
+                      left: `${(p.x / VB_W) * 100}%`,
+                      top: `${((p.y + (below ? 30 : -50)) / VB_H) * 100}%`,
+                    }}
+                  >
+                    {s.title}
+                  </button>
+                )}
 
-                <div className="pt-2 border-t border-[var(--color-border)] space-y-1.5">
-                  {stage.deliverables.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-[11px] text-[var(--color-charcoal)]">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
+                {/* card: opens just after the logo arrives */}
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      key="card"
+                      role="group"
+                      aria-label={s.title}
+                      initial={{ opacity: 0, y: reduced ? 0 : below ? -12 : 12, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.2 } }}
+                      transition={{
+                        duration: reduced ? 0 : 0.5,
+                        delay: reduced ? 0 : 0.6,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="absolute z-20 w-[300px] overflow-hidden rounded-2xl border border-white/20 bg-white/[0.08] p-5 backdrop-blur-xl"
+                      style={{
+                        left: `${(p.x / VB_W) * 100}%`,
+                        transform: `translateX(${shift})`,
+                        ...(below
+                          ? { top: `calc(${(p.y / VB_H) * 100}% + 56px)` }
+                          : { bottom: `calc(${100 - (p.y / VB_H) * 100}% + 56px)` }),
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold/20 text-gold">
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
+                            Step {String(i + 1).padStart(2, "0")}
+                          </p>
+                          <h3 className="font-heading text-lg font-bold !text-white">
+                            {s.title}
+                          </h3>
+                        </div>
+                      </div>
+                      <p className="mt-3 text-sm leading-relaxed !text-white/80">
+                        {s.text}
+                      </p>
+                      {!reduced && (
+                        <div className="mt-4 h-[3px] w-full overflow-hidden rounded-full bg-white/15">
+                          <motion.div
+                            key={`${active}-${paused}`}
+                            className="h-full bg-gold"
+                            initial={{ width: paused ? "100%" : "0%" }}
+                            animate={{ width: "100%" }}
+                            transition={{
+                              duration: paused ? 0 : (AUTOPLAY_MS - 600) / 1000,
+                              delay: paused ? 0 : 0.6,
+                              ease: "linear",
+                            }}
+                          />
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            ))}
-          </div>
-        </Container>
-      </div>
+            );
+          })}
+        </div>
+
+        {/* ================= MOBILE / TABLET: vertical timeline ================= */}
+        <ol className="relative mx-auto mt-12 max-w-xl lg:hidden">
+          <span
+            aria-hidden="true"
+            className="absolute bottom-4 left-[23px] top-4 w-px bg-white/20"
+          />
+          {steps.map((s, i) => {
+            const isActive = i === active;
+            const Icon = s.icon;
+            return (
+              <li key={s.title} className="relative pl-16">
+                <button
+                  type="button"
+                  onClick={() => setActive(i)}
+                  aria-expanded={isActive}
+                  aria-label={`Step ${i + 1}: ${s.title}`}
+                  className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center"
+                >
+                  {isActive ? (
+                    <span className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold bg-primary-dark shadow-[0_0_0_6px_rgba(255,255,255,0.08)]">
+                      <Image
+                        src={LOGO_SRC}
+                        alt=""
+                        width={28}
+                        height={28}
+                        className="h-7 w-7 object-contain"
+                      />
+                      <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-bg-dark">
+                        {i + 1}
+                      </span>
+                    </span>
+                  ) : (
+                    <span
+                      className={`h-4 w-4 rounded-full border-2 ${
+                        i < active
+                          ? "border-gold bg-gold"
+                          : "border-white/60 bg-primary-dark"
+                      }`}
+                    />
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActive(i)}
+                  className={`block w-full pb-1 pt-2.5 text-left font-heading text-lg font-bold transition-colors ${
+                    isActive ? "text-white" : "text-white/60"
+                  }`}
+                >
+                  {s.title}
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isActive && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: reduced ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mb-6 mt-2 rounded-2xl border border-white/20 bg-white/[0.08] p-4 backdrop-blur-xl">
+                        <Icon className="mb-2 h-5 w-5 text-gold" />
+                        <p className="text-sm leading-relaxed !text-white/80">{s.text}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                {!isActive && <div className="h-6" />}
+              </li>
+            );
+          })}
+        </ol>
+      </Container>
     </section>
   );
 }
