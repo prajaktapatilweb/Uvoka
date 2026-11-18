@@ -116,7 +116,7 @@ export function JourneyMap() {
     <section
       id="journey"
       aria-labelledby="journey-heading"
-      className="relative isolate overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-bg-dark py-20 text-white md:py-28"
+      className="relative isolate overflow-hidden  bg-gradient-to-br from-primary-dark via-primary to-bg-dark py-20 text-white md:py-35"
     >
       <div
         aria-hidden="true"

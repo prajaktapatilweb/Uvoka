@@ -14,8 +14,9 @@ if (typeof window !== "undefined") {
 export interface SectionHeadingProps {
   eyebrow?: string;
   title: string;
+  titleColor?: "white";
   highlight?: string;
-  highlightColor?: "primary" | "gold" | "gradient";
+  highlightColor?: "primary" | "gold" | "gradient" | "white";
   italicPhrase?: string;
   subtitle?: string;
   align?: "left" | "center" | "right";
@@ -27,6 +28,7 @@ export interface SectionHeadingProps {
 export function SectionHeading({
   eyebrow,
   title,
+  titleColor,
   highlight,
   highlightColor = "primary",
   italicPhrase,
@@ -51,7 +53,9 @@ export function SectionHeading({
     primary: "text-[var(--color-primary)]",
     gold: "text-[var(--color-gold)]",
     gradient: "gradient-text",
+    white: "text-white",
   }[highlightColor];
+  const resolvedHighlightClass = titleColor === "white" ? "text-white" : highlightClass;
 
   useLayoutEffect(() => {
     if (reduced || !containerRef.current) return;
@@ -121,7 +125,7 @@ export function SectionHeading({
         return (
           <>
             {parts[0]}
-            <span className={cn(highlightClass, "font-bold")}>{highlight}</span>
+            <span className={cn(resolvedHighlightClass, "font-bold")}>{highlight}</span>
             {parts[1]}
           </>
         );
@@ -153,7 +157,7 @@ export function SectionHeading({
       if (isItalic) {
         wordStyle = "font-editorial italic font-normal text-[var(--color-primary)]";
       } else if (isHighlight) {
-        wordStyle = cn(highlightClass, "font-bold");
+        wordStyle = cn(resolvedHighlightClass, "font-bold");
       }
 
       return (

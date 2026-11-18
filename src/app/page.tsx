@@ -47,7 +47,7 @@ export default function Home() {
       <SpecialOffer />
 
       {/* ── 08. Add-ons ── */}
-      <AddOns />
+      {/* <AddOns /> */}
 
 
 
@@ -59,14 +59,13 @@ export default function Home() {
 
       {/* ── 11. Blogs -- Dynamic Sanity CMS Integration Preview ── */}
       <BlogsPreview />
-
       {/* ── 12. Resources & Tools ── */}
       <Resources />
 
 
 
       {/* ── 14. Press Releases ── */}
-      <PressRelease />
+      {/* <PressRelease /> */}
       {/* ── 16. FAQ Accordion ── */}
       <FAQ />
 

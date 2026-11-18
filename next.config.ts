@@ -9,6 +9,16 @@ const nextConfig: NextConfig = {
         hostname: "cdn.sanity.io",
         pathname: "/images/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.uvoka.in",
+        pathname: "/c.webp",
+      },
+      {
+        protocol: "https",
+        hostname: "www.uvoka.in",
+        pathname: "/rb.webp",
+      },
     ],
     formats: ["image/avif", "image/webp"],
     deviceSizes: [375, 640, 768, 1024, 1280, 1536, 1920],

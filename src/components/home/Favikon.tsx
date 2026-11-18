@@ -5,6 +5,7 @@ import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { Container } from "@/components/common/Container";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { cn } from "@/lib/utils";
+import { SectionHeadingcopy } from "../common/SectionHeadingcopy";
 
 interface FavikonStat {
   id: string;
@@ -24,12 +25,12 @@ export default function FavikonCounter() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section
+    <section 
       aria-label="Favikon creator rankings"
       className="relative overflow-hidden bg-bg-dark py-16 text-white sm:py-20 md:py-28"
     >
       <Container className="relative">
-        <SectionHeading
+        <SectionHeadingcopy
           eyebrow="Favikon Creator Rankings"
           title="Our clients rank among the best on Favikon"
           highlight="among the best"
@@ -85,7 +86,7 @@ export default function FavikonCounter() {
                   </motion.div>
                 </div>
 
-                <p className="mt-4 text-sm text-white/80">{stat.note}</p>
+                <p className="mt-4 text-sm text-white/80" style={{ color: 'lightgray' }}>{stat.note}</p>
               </dd>
             </div>
           ))}

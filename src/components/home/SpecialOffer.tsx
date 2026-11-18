@@ -1,108 +1,226 @@
-import { Sparkles, Check, ArrowRight, ShieldCheck, Clock } from "lucide-react";
-import { CURRENT_OFFER } from "@/data/homeData";
+"use client";
+
+import Link from "next/link";
+import type { Route } from "next";
+import { motion } from "framer-motion";
+import {
+  Sparkles,
+  Check,
+  ArrowRight,
+  ShieldCheck,
+  Clock,
+  MailOpen,
+  Globe,
+  PenTool,
+  CheckCircle2,
+  Plus,
+} from "lucide-react";
+import { CURRENT_OFFER, ADD_ONS } from "@/data/homeData";
 import { Container } from "@/components/common/Container";
 import { Button } from "@/components/common/Button";
-import { Badge } from "@/components/common/Badge";
 import { MagneticButton } from "@/components/animations/MagneticButton";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+
+const ADDON_ICONS = [MailOpen, Globe, PenTool];
+const ease = [0.22, 1, 0.36, 1] as const;
 
 export function SpecialOffer() {
+  const reduced = useReducedMotion();
+
+  const reveal = (delay = 0) => ({
+    initial: { opacity: 0, y: reduced ? 0 : 28 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-60px" },
+    transition: { duration: reduced ? 0 : 0.7, delay, ease },
+  });
+
   return (
-    <section className="section-padding-lg bg-[var(--color-bg-dark)] text-white relative overflow-hidden">
-      {/* Background radial luxury glows */}
+    <section
+      id="offer"
+      className="section-padding-lg relative isolate overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-bg-dark text-white"
+    >
+      {/* glows + dot texture, same family as the hero */}
       <div
-        className="absolute top-0 right-10 w-96 h-96 rounded-full bg-[var(--color-primary)]/40 blur-3xl pointer-events-none"
         aria-hidden="true"
+        className="pointer-events-none absolute -right-32 -top-32 -z-10 h-[520px] w-[520px] rounded-full bg-primary-muted/25 blur-[110px]"
       />
       <div
-        className="absolute bottom-0 left-10 w-96 h-96 rounded-full bg-[var(--color-gold)]/15 blur-3xl pointer-events-none"
         aria-hidden="true"
+        className="pointer-events-none absolute -bottom-40 -left-24 -z-10 h-[460px] w-[460px] rounded-full bg-gold/15 blur-[110px]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.05] [background-image:radial-gradient(white_1px,transparent_1px)] [background-size:22px_22px]"
       />
 
       <Container>
-        <div className="max-w-5xl mx-auto rounded-3xl border border-white/15 bg-white/[0.04] backdrop-blur-md p-8 sm:p-12 md:p-16 relative overflow-hidden shadow-2xl">
-          {/* Subtle gold border highlight line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--color-gold)] to-transparent" />
+        {/* ============ 1. THE OFFER: a ticket with a price stub ============ */}
+        <motion.div
+          {...reveal()}
+          className="mx-auto grid max-w-6xl overflow-hidden rounded-[28px] shadow-[0_40px_90px_rgba(0,0,0,0.35)] lg:grid-cols-12"
+        >
+          {/* ticket body */}
+          <div className="relative bg-ivory p-8 text-charcoal sm:p-12 lg:col-span-8">
+            <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-gold via-primary-muted to-gold" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Left Content Column (7 cols) */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="gold" size="md" className="gap-1.5 uppercase font-bold tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  {CURRENT_OFFER.badge}
-                </Badge>
-                <span className="text-xs font-mono text-[var(--color-gold)] font-medium flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  {CURRENT_OFFER.discountPercentage}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-dark px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-gold">
+                <Sparkles className="h-3.5 w-3.5" />
+                {CURRENT_OFFER.badge}
+              </span>
+              <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-primary">
+                <Clock className="h-3.5 w-3.5" />
+                {CURRENT_OFFER.discountPercentage}
+              </span>
+            </div>
+
+            <h2 className="mt-6 font-heading text-3xl font-extrabold leading-[1.1] tracking-tight !text-charcoal sm:text-4xl">
+              {CURRENT_OFFER.title}
+            </h2>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-text-secondary sm:text-base">
+              {CURRENT_OFFER.subtitle}
+            </p>
+
+            <ul className="mt-7 grid gap-3 sm:grid-cols-2">
+              {CURRENT_OFFER.benefits.map((benefit, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-white">
+                    <Check className="h-3 w-3" />
+                  </span>
+                  <span className="text-sm text-charcoal/90">{benefit}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-7 flex items-center gap-2 font-mono text-xs text-primary">
+              <ShieldCheck className="h-4 w-4 shrink-0" />
+              {CURRENT_OFFER.validityNotice}
+            </p>
+          </div>
+
+          {/* price stub */}
+          <div className="relative flex flex-col justify-between gap-8 bg-gradient-to-b from-primary to-primary-dark p-8 text-center sm:p-10 lg:col-span-4 lg:border-l-2 lg:border-dashed lg:border-white/30">
+            <div>
+              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/70">
+                Sprint Investment
+              </span>
+              <div className="mt-3 flex flex-col items-center gap-1">
+                <span className="font-heading text-5xl font-extrabold text-gold xl:text-6xl">
+                  {CURRENT_OFFER.discountPrice}
+                </span>
+                <span className="font-mono text-sm text-white/50 line-through">
+                  {CURRENT_OFFER.originalPrice}
                 </span>
               </div>
-
-              <h2 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-white leading-tight">
-                {CURRENT_OFFER.title}
-              </h2>
-
-              <p className="text-sm sm:text-base text-white/75 leading-relaxed">
-                {CURRENT_OFFER.subtitle}
+              <p className="mt-3 text-xs text-white/70">
+                Billed quarterly · Verified deliverables guaranteed
               </p>
-
-              {/* Benefit Checklist */}
-              <div className="space-y-3 pt-2">
-                {CURRENT_OFFER.benefits.map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-[var(--color-gold)]/20 border border-[var(--color-gold)] flex items-center justify-center shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-[var(--color-gold)]" />
-                    </div>
-                    <span className="text-xs sm:text-sm text-white/90">
-                      {benefit}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Validity Notice */}
-              <div className="pt-2 flex items-center gap-2 text-xs font-mono text-[var(--color-gold)]/90">
-                <ShieldCheck className="w-4 h-4 text-[var(--color-gold)]" />
-                <span>{CURRENT_OFFER.validityNotice}</span>
-              </div>
             </div>
 
-            {/* Right Card Column (5 cols): Investment & Direct Booking */}
-            <div className="lg:col-span-5 flex flex-col justify-between p-8 rounded-2xl bg-white/[0.08] border border-white/20 text-center space-y-6">
-              <div className="space-y-2">
-                <span className="text-xs uppercase font-mono tracking-widest text-white/60">
-                  Sprint Investment
-                </span>
-                <div className="flex items-baseline justify-center gap-3">
-                  <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold font-heading text-[var(--color-gold)]">
-                    {CURRENT_OFFER.discountPrice}
-                  </span>
-                  <span className="text-sm line-through text-white/40 font-mono">
-                    {CURRENT_OFFER.originalPrice}
-                  </span>
-                </div>
-                <p className="text-xs text-white/60">
-                  Billed quarterly · Verified deliverables guaranteed
-                </p>
-              </div>
+            <div className="space-y-3">
+              <MagneticButton className="w-full">
+                <Button
+                  href="/contact"
+                  variant="gold"
+                  size="lg"
+                  icon={<ArrowRight className="h-4 w-4" />}
+                  className="w-full justify-center shadow-xl"
+                >
+                  Secure Sprint Privilege
+                </Button>
+              </MagneticButton>
+              <p className="font-mono text-[11px] text-white/60">
+                No long-term lock-in · Strict exclusivity per category
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
-              <div className="space-y-3 flex flex-col items-center">
-                <MagneticButton className="w-full">
-                  <Button
-                    href="/contact"
-                    variant="gold"
-                    size="lg"
-                    icon={<ArrowRight className="w-4 h-4 text-[var(--color-charcoal)]" />}
-                    className="w-full justify-center shadow-xl hover:scale-105 transition-transform"
+        {/* ============ connector ============ */}
+        <motion.div
+          {...reveal(0.1)}
+          className="mx-auto my-14 flex max-w-6xl items-center gap-4 md:my-20"
+        >
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/25" />
+          <span className="inline-flex items-center gap-2 rounded-full border border-gold/60 bg-white/[0.07] px-5 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-gold backdrop-blur-md">
+            <Plus className="h-4 w-4" />
+            Stack it with add-ons
+          </span>
+          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/25" />
+        </motion.div>
+
+        {/* ============ 2. ADD-ONS: open columns, no cards ============ */}
+        <div className="mx-auto max-w-6xl">
+          <motion.div {...reveal()} className="max-w-2xl">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+              Specialized Add-ons
+            </p>
+            <h2 className="mt-3 font-heading text-3xl font-extrabold leading-[1.1] tracking-tight !text-white md:text-4xl">
+              Complementary{" "}
+              <span className="font-editorial font-normal italic text-gold">
+                High-Impact Capabilities
+              </span>
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed !text-white/70 sm:text-base">
+              Beyond core LinkedIn branding, we provide deep-craft ecosystem
+              extensions to amplify founder influence across owned channels.
+            </p>
+          </motion.div>
+
+          <div className="mt-12 grid gap-12 md:grid-cols-3 md:gap-0">
+            {ADD_ONS.map((addon, index) => {
+              const Icon = ADDON_ICONS[index % ADDON_ICONS.length];
+              return (
+                <motion.article
+                  key={addon.id}
+                  {...reveal(index * 0.12)}
+                  className={`group relative flex flex-col md:px-8 ${
+                    index === 0 ? "md:pl-0" : "md:border-l md:border-white/15"
+                  } ${index === ADD_ONS.length - 1 ? "md:pr-0" : ""}`}
+                >
+                  {/* big outline number */}
+                  <span
+                    aria-hidden="true"
+                    className="font-heading text-7xl font-extrabold leading-none text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.25)] transition-[-webkit-text-stroke-color] duration-300 group-hover:[-webkit-text-stroke:1px_var(--color-gold)]"
                   >
-                    Secure Sprint Privilege
-                  </Button>
-                </MagneticButton>
+                    0{index + 1}
+                  </span>
 
-                <p className="text-[11px] text-white/50 font-mono">
-                  No long-term lock-in · Strict exclusivity per category
-                </p>
-              </div>
-            </div>
+                  <div className="mt-5 flex items-center gap-3">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/15 text-gold ring-1 ring-gold/40 transition-transform duration-300 group-hover:scale-110">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <h3 className="font-heading text-xl font-bold !text-white transition-colors group-hover:!text-gold">
+                      {addon.title}
+                    </h3>
+                  </div>
+
+                  <p className="mt-3 text-sm leading-relaxed !text-white/70">
+                    {addon.shortDesc}
+                  </p>
+
+                  <ul className="mt-5 space-y-2.5">
+                    {addon.deliverables.map((item, i) => (
+                      <li
+                        key={i}
+                        className="flex items-start gap-2.5 text-sm text-white/85"
+                      >
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href={"/contact" as Route}
+                    className="mt-7 inline-flex items-center gap-2 self-start border-b border-gold/50 pb-1 text-sm font-semibold text-gold transition-all hover:gap-3 hover:border-gold"
+                  >
+                    {addon.ctaLabel}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </motion.article>
+              );
+            })}
           </div>
         </div>
       </Container>
