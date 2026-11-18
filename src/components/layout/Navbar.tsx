@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import Image from "next/image";
@@ -15,6 +15,7 @@ export function Navbar() {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const pathname = usePathname();
   const isHeroOverlay = pathname === "/" && !isScrolled;
+  const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -202,7 +203,7 @@ export function Navbar() {
       {/* Mobile Drawer Navigation */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
+        onClose={closeMobileMenu}
       />
     </>
   );
