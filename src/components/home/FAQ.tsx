@@ -127,16 +127,16 @@ export function FAQ() {
                     <span
                       className={`text-xs font-mono font-bold px-2.5 py-1 rounded-md border shrink-0 transition-colors duration-300 ${
                         isOpen
-                          ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-xs"
+                          ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)] shadow-xs "
                           : "bg-[var(--color-ivory)] text-[var(--color-gold)] border-[var(--color-border)] group-hover:border-[var(--color-gold)]"
                       }`}
                     >
                       {itemNumber}
                     </span>
 
-                    <h3 className="font-heading font-bold text-base sm:text-lg text-[var(--color-charcoal)] group-hover:text-[var(--color-primary)] transition-colors leading-snug">
+                    <h4 className="font-heading font-bold text-base sm:text-lg text-[var(--color-charcoal)] group-hover:text-[var(--color-primary)] transition-colors leading-snug">
                       {faq.question}
-                    </h3>
+                    </h4>
                   </div>
 
                   {/* Smooth Rotating Toggle Button */}

@@ -58,7 +58,7 @@ export function CTA() {
   return (
     <section
       ref={sectionRef}
-      className="section-padding-lg bg-[var(--color-bg-dark)] text-white relative overflow-hidden"
+      className="section pb-10  text-white relative overflow-hidden"
     >
       {/* Background radial luxury glows with Parallax Scrub */}
       <div
@@ -72,7 +72,7 @@ export function CTA() {
         aria-hidden="true"
       />
 
-      <Container size="narrow" className="relative z-10 text-center space-y-8">
+      <Container  className="relative z-10 text-center space-y-8 bg-[var(--color-bg-dark)] py-10 rounded-4xl">
         <div className="inline-flex items-center gap-2">
           <Badge variant="gold" size="md" className="gap-1.5 uppercase font-bold tracking-wider shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-[var(--color-charcoal)]" />
@@ -80,14 +80,14 @@ export function CTA() {
           </Badge>
         </div>
 
-        <h2 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-tight tracking-tight text-balance">
+        <h2 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-tight tracking-tight text-balance" style={{ color: "white" }}>
           Ready to Claim Your Category&apos;s{" "}
           <span className="font-editorial italic font-normal text-[var(--color-gold)]">
             Uncontested Authority?
           </span>
         </h2>
 
-        <p className="max-w-2xl mx-auto text-base sm:text-lg text-white/80 leading-relaxed text-balance">
+        <p className="max-w-2xl mx-auto text-base sm:text-lg text-white/80 leading-relaxed text-balance" style={{ color: "lightgray" }}>
           Stop losing enterprise market share and top-tier talent to competitors with
           inferior products who simply communicate with more conviction. Let UVOKA architect
           your definitive LinkedIn authority.

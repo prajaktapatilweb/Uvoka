@@ -78,7 +78,7 @@ export function Footer() {
 
           {/* Services Column */}
           <div className="space-y-4">
-            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]">
+            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]" style={{ color: "#D2B98B" }}>
               Services
             </h4>
             <ul className="space-y-2.5 text-sm text-white/70">
@@ -97,7 +97,7 @@ export function Footer() {
 
           {/* Navigation / Company Column */}
           <div className="space-y-4">
-            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]">
+            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]" style={{ color: "#D2B98B" }}>
               Company
             </h4>
             <ul className="space-y-2.5 text-sm text-white/70">
@@ -124,7 +124,7 @@ export function Footer() {
 
           {/* Contact Column */}
           <div className="space-y-4">
-            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]">
+            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]" style={{ color: "#D2B98B" }}>
               Get in Touch
             </h4>
             <div className="space-y-3 text-sm text-white/70">
