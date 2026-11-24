@@ -113,7 +113,7 @@ export function SectionHeading({
         return (
           <>
             {parts[0]}
-            <span className="font-editorial italic font-normal text-[var(--color-primary)]">
+            <span className="  font-bold text-[var(--color-primary)]">
               {italicPhrase}
             </span>
             {parts[1]}
@@ -155,7 +155,7 @@ export function SectionHeading({
 
       let wordStyle = "";
       if (isItalic) {
-        wordStyle = "font-editorial italic font-normal text-[var(--color-primary)]";
+        wordStyle = "font-bold text-[var(--color-primary)]";
       } else if (isHighlight) {
         wordStyle = cn(resolvedHighlightClass, "font-bold");
       }

@@ -36,3 +36,116 @@ export function TwitterXIcon({ className = "w-4 h-4" }: { className?: string }) 
     </svg>
   );
 }
+// 1. Trophy Icon (Cup with dual handles, pedestal, and star insignia)
+export function TrophyIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+      <path d="M18 9h1.5a2.5 1.5 0 0 0 1-5H18" />
+      <path d="M4 4h16v5a7 7 0 0 1-14 0V4Z" />
+      <path d="M12 16v3" />
+      <path d="M8 21h8" />
+      <path d="M10 19h4" />
+      <path d="m12 7 .7 1.4 1.5.2-1.1 1.1.3 1.5-1.4-.7-1.4.7.3-1.5-1.1-1.1 1.5-.2Z" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+// 2. Achievement / Award Medal Icon (Rosette ribbon seal with star center)
+export function AchievementIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="9" r="6" />
+      <path d="m12 6.5.7 1.4 1.5.2-1.1 1.1.3 1.5-1.4-.7-1.4.7.3-1.5-1.1-1.1 1.5-.2Z" fill="currentColor" stroke="none" />
+      <path d="m8.2 13.5-2.2 7.5 6-3 6 3-2.2-7.5" />
+    </svg>
+  );
+}
+
+// 3. Goal / Target Bullseye Icon (Precision target with dart in bullseye)
+export function GoalIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
+      <path d="m12 2v2m0 16v2m-10-10h2m16 0h2" />
+      <path d="m15 9 6-6m-3 0h3v3" />
+    </svg>
+  );
+}
+
+
+
+// 3. Goal / Milestone Flag Icon (Summit Achievement)
+export function MilestoneFlagIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+      <line x1="4" x2="4" y1="22" y2="2" />
+      <path d="m8 6 1.5 2 2.5-3" />
+    </svg>
+  );
+}
+
+// 4. Target Crosshair Icon (Precision Objective)
+export function TargetIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+      <line x1="12" x2="12" y1="2" y2="5" />
+      <line x1="12" x2="12" y1="19" y2="22" />
+      <line x1="2" x2="5" y1="12" y2="12" />
+      <line x1="19" x2="22" y1="12" y2="12" />
+    </svg>
+  );
+}
+
+

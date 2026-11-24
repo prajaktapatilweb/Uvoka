@@ -1,65 +1,294 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  ArrowDown,
+  Globe2,
+  ShieldCheck,
   Sparkles,
   TrendingUp,
-  ShieldCheck,
-  BadgeCheck,
-  BriefcaseBusiness,
+  UsersRound,
 } from "lucide-react";
 
 import { Container } from "@/components/common/Container";
 import { Button } from "@/components/common/Button";
 import { MagneticButton } from "@/components/animations/MagneticButton";
+import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { LinkedInIcon } from "../common/Icons";
-import { FeaturedIn } from "./FeaturedIn";
+import { GoalIcon, LinkedInIcon, TrophyIcon, MilestoneFlagIcon } from "../common/Icons";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = [0.16, 1, 0.3, 1] as const;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease } },
 };
 
-const chipsContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.15, delayChildren: 0.6 } },
-};
-
-const chip = {
-  hidden: { opacity: 0, y: 30, scale: 0.9 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7, ease } },
-};
-
-const trust = [
-  { icon: TrendingUp, value: "50M+", label: "Organic Executive Impressions" },
-  { icon: ShieldCheck, value: "100%", label: "Bespoke Executive Voice Architecture" },
-  { icon: BriefcaseBusiness, value: "Top 1%", label: "Creator Authority Positioning" },
+const heroStats = [
+  { value: 50, suffix: "M+", label: "Organic Views", icon: TrendingUp },
+  { value: 25, suffix: "+", label: "Clients Served", icon: UsersRound },
+  { value: 7, suffix: "+", label: "Countries", icon: Globe2 },
 ];
 
-const floatingStats = [
-  { value: "50M+", label: "Organic Views", tone: "violet" },
-  { value: "25+", label: "Clients Served", tone: "gold" },
-  { value: "7+", label: "Countries", tone: "violet" },
-  { value: "1:1", label: "Bespoke Strategy", tone: "gold" },
-] as const;
+/* Bottom wave: two very similar shapes (same commands) that the wave slowly
+   moves between. Adjusted lower to preserve full purple coverage on mobile. */
+const EDGE_A = "C 820 975 690 925 500 955 C 310 985 180 925 0 960";
+const EDGE_B = "C 820 965 690 935 500 945 C 310 970 180 935 0 950";
+const FILL_A = `M 0 0 H 1000 V 940 ${EDGE_A} Z`;
+const FILL_B = `M 0 0 H 1000 V 940 ${EDGE_B} Z`;
+const LINE_A = `M 1000 940 ${EDGE_A}`;
+const LINE_B = `M 1000 940 ${EDGE_B}`;
+const WAVE_MOVE = { duration: 7, repeat: Infinity, ease: "easeInOut" as const };
+
+/* ============ background motion data ============
+   Seeded random numbers, so the server and the browser build the exact same
+   values (no hydration mismatch). Change the seed or the counts to taste. */
+function seeded(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+const rand = seeded(42);
+
+// small glowing dots that drift in a direction, fade in and fade out
+const DOTS = Array.from({ length: 64 }, () => ({
+  left: +(rand() * 100).toFixed(2),
+  top: +(4 + rand() * 78).toFixed(2),
+  size: +(2 + rand() * 3).toFixed(1),
+  dx: Math.round((rand() - 0.5) * 180),
+  dy: Math.round((rand() - 0.5) * 180),
+  dur: +(5 + rand() * 6).toFixed(1),
+  delay: +(rand() * 6).toFixed(1),
+  gold: rand() > 0.88,
+}));
+
+// four-point sparkles that twinkle in place
+const STARS = Array.from({ length: 7 }, () => ({
+  left: +(rand() * 96).toFixed(2),
+  top: +(6 + rand() * 72).toFixed(2),
+  size: Math.round(10 + rand() * 9),
+  dur: +(2.5 + rand() * 2).toFixed(1),
+  delay: +(rand() * 5).toFixed(1),
+}));
+
+function BackgroundMotion() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+    >
+      {DOTS.map((d, i) => (
+        <motion.span
+          key={`dot-${i}`}
+          className={`absolute rounded-full ${d.gold ? "bg-gold/80" : "bg-white"} ${
+            i > 22 ? "hidden sm:block" : ""
+          }`}
+          style={{
+            left: `${d.left}%`,
+            top: `${d.top}%`,
+            width: d.size,
+            height: d.size,
+            boxShadow: d.gold
+              ? "0 0 6px 1px rgba(210,185,139,0.5)"
+              : "0 0 8px 1px rgba(255,255,255,0.7)",
+          }}
+          animate={{ opacity: [0, 0.9, 0], x: [0, d.dx], y: [0, d.dy], scale: [0.5, 1, 0.5] }}
+          transition={{ duration: d.dur, delay: d.delay, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ))}
+
+      {STARS.map((s, i) => (
+        <motion.svg
+          key={`star-${i}`}
+          viewBox="0 0 24 24"
+          className={`absolute text-white/70 ${i > 3 ? "hidden sm:block" : ""}`}
+          style={{ left: `${s.left}%`, top: `${s.top}%`, width: s.size, height: s.size }}
+          animate={{ opacity: [0, 1, 0], scale: [0.3, 1, 0.3], rotate: [0, 90] }}
+          transition={{ duration: s.dur, delay: s.delay, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <path
+            d="M12 0 L14.6 9.4 L24 12 L14.6 14.6 L12 24 L9.4 14.6 L0 12 L9.4 9.4 Z"
+            fill="currentColor"
+          />
+        </motion.svg>
+      ))}
+    </div>
+  );
+}
+
+/* ============ social icons ============ */
+function InstagramGlyph({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/*
+  Where each icon sits. `pos` is a Tailwind position (mobile first, then lg),
+  `size` is the badge size. Items with `lgOnly` are hidden on phones/tablets.
+  Add, remove or move items freely.
+*/
+type SocialBadgeType = "linkedin" | "instagram" | "trophy" | "goal" | "milestone";
+
+interface SocialItem {
+  type: SocialBadgeType;
+  pos: string;
+  size: string;
+  lgOnly: boolean;
+  delay: number;
+}
+
+const SOCIALS: SocialItem[] = [
+  { type: "linkedin", pos: "right-[5%] top-[14%] lg:right-[8%] lg:top-[20%]", size: "h-11 w-11 lg:h-14 lg:w-14", lgOnly: false, delay: 0 },
+  { type: "trophy", pos: "left-[5%] top-[18%] lg:top-[15%]", size: "h-10 w-10 lg:h-14 lg:w-14", lgOnly: false, delay: 0.8 },
+  { type: "goal", pos: "left-[44%] top-[8%]", size: "h-14 w-14", lgOnly: true, delay: 1.6 },
+  { type: "milestone", pos: "left-[3%] top-[54%]", size: "h-16 w-16", lgOnly: true, delay: 2.4 },
+  { type: "linkedin", pos: "right-[35%] top-[74%]", size: "h-12 w-12", lgOnly: true, delay: 3.2 },
+  { type: "trophy", pos: "right-[17%] top-[62%]", size: "h-14 w-14", lgOnly: true, delay: 4 },
+];
+
+function SocialIcons({ reduced }: { reduced: boolean }) {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
+      {SOCIALS.map((item, i) => (
+        <motion.div
+          key={i}
+          className={`absolute ${item.pos} ${item.size} ${item.lgOnly ? "hidden lg:block" : ""}`}
+          animate={reduced ? undefined : { y: [0, -10, 0] }}
+          transition={{ duration: 5 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: item.delay }}
+        >
+          {/* rings that radiate outward */}
+          {!reduced &&
+            [0, 1.5].map((d) => (
+              <motion.span
+                key={d}
+                className="absolute inset-0 rounded-full border border-white/20"
+                animate={{ scale: [1, 2.1], opacity: [0.35, 0] }}
+                transition={{ duration: 3, delay: item.delay + d, repeat: Infinity, ease: "easeOut" }}
+              />
+            ))}
+
+          {/* sparkles that circle around the icon */}
+          {!reduced && (
+            <motion.div
+              className="absolute -inset-[38%]"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 12 + (i % 3) * 3, repeat: Infinity, ease: "linear" }}
+            >
+              {[
+                "left-1/2 top-0 -translate-x-1/2",
+                "bottom-[14%] left-[6%]",
+                "bottom-[14%] right-[6%]",
+              ].map((spot, k) => (
+                <motion.svg
+                  key={k}
+                  viewBox="0 0 24 24"
+                  className={`absolute h-3 w-3 text-white/60 lg:h-4 lg:w-4 ${spot}`}
+                  animate={{ opacity: [0.1, 0.7, 0.1], scale: [0.6, 1.2, 0.6] }}
+                  transition={{ duration: 2 + k * 0.4, delay: item.delay + k * 0.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <path
+                    d="M12 0 L14.6 9.4 L24 12 L14.6 14.6 L12 24 L9.4 14.6 L0 12 L9.4 9.4 Z"
+                    fill="currentColor"
+                  />
+                </motion.svg>
+              ))}
+            </motion.div>
+          )}
+
+          {/* the round glass badge with the icon */}
+         <span className="absolute inset-0 flex items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/25 shadow-[0_0_18px_rgba(217,187,122,0.12)] backdrop-blur-sm">
+  {item.type === "linkedin" && <LinkedInIcon className="h-1/2 w-1/2" />}
+  {item.type === "trophy" && <TrophyIcon className="h-1/2 w-1/2" />}
+  {item.type === "goal" && <GoalIcon className="h-1/2 w-1/2" />}
+  {item.type === "milestone" && <MilestoneFlagIcon className="h-1/2 w-1/2" />}
+</span>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const orbRef = useRef<HTMLDivElement>(null);
-  const visualRef = useRef<HTMLDivElement>(null);
+  const [visibleWords, setVisibleWords] = useState(0);
+  const [brandWord, setBrandWord] = useState("Brands");
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
   const reduced = useReducedMotion();
+
+  const cascadeVariants = {
+    hidden: { opacity: 0, y: reduced ? 0 : 16 },
+    visible: (customDelay: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: reduced ? 0 : 0.85,
+        delay: reduced ? 0 : customDelay,
+        ease,
+      },
+    }),
+  };
+
+  useEffect(() => {
+    if (reduced) {
+      setVisibleWords(3);
+      setBrandWord("Legacies");
+      setIsTypingComplete(true);
+      return;
+    }
+
+    const timers: number[] = [];
+    const schedule = (delay: number, callback: () => void) => {
+      timers.push(window.setTimeout(callback, delay));
+    };
+
+    schedule(350, () => setVisibleWords(1));
+    schedule(800, () => setVisibleWords(2));
+    schedule(1250, () => setVisibleWords(3));
+
+    const deletionStart = 2400;
+    for (let length = "Brands".length - 1; length >= 0; length -= 1) {
+      schedule(deletionStart + ("Brands".length - length - 1) * 125, () =>
+        setBrandWord("Brands".slice(0, length)),
+      );
+    }
+
+    const typingStart = deletionStart + "Brands".length * 125 + 140;
+    for (let length = 1; length <= "Legacies".length; length += 1) {
+      schedule(typingStart + (length - 1) * 150, () =>
+        setBrandWord("Legacies".slice(0, length)),
+      );
+    }
+
+    schedule(typingStart + "Legacies".length * 150 + 200, () => {
+      setIsTypingComplete(true);
+    });
+
+    return () => timers.forEach(window.clearTimeout);
+  }, [reduced]);
 
   useLayoutEffect(() => {
     if (reduced || !heroRef.current) return;
@@ -75,37 +304,15 @@ export function Hero() {
           scrub: 1.2,
         },
       });
-
-      gsap.to(visualRef.current, {
-        y: -30,
-        ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1.5,
-        },
-      });
     }, heroRef);
 
     return () => ctx.revert();
   }, [reduced]);
 
-  const scrollToWork = () => {
-    document
-      .getElementById("featured-section")
-      ?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const float = (distance: number, duration: number) =>
-    reduced
-      ? undefined
-      : { animate: { y: [0, distance, 0] }, transition: { duration, repeat: Infinity, ease: "easeInOut" as const } };
-
   return (
     <section
       ref={heroRef}
-      className="relative isolate -mt-20 overflow-hidden xl:min-h-screen"
+      className="relative isolate -mt-20 overflow-hidden"
       style={{ background: "var(--gradient-hero)" }}
     >
       {/* ================= BACKGROUND ================= */}
@@ -113,15 +320,7 @@ export function Hero() {
       <div
         ref={orbRef}
         aria-hidden="true"
-        className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[420px] w-[420px] rounded-full bg-primary/10 blur-[100px] xl:h-[650px] xl:w-[650px]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-48 right-[10%] -z-10 h-[360px] w-[360px] rounded-full bg-gold/15 blur-[110px] xl:h-[500px] xl:w-[500px]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-20 top-0 -z-10 hidden h-[700px] w-[700px] rounded-full border border-primary-muted/25 xl:block"
+        className="pointer-events-none absolute -left-40 -top-40 -z-10 h-[420px] w-[420px] rounded-full bg-primary/10 blur-[100px] xl:h-[650px] xl:w-[650px]"
       />
       {/* subtle grid texture */}
       <div
@@ -129,13 +328,16 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 -z-10 opacity-[0.035] [background-image:radial-gradient(var(--color-primary-dark)_1px,transparent_1px)] [background-size:22px_22px]"
       />
 
+      {/* LinkedIn + Instagram icons with sparkles circling them */}
+      <SocialIcons reduced={reduced} />
+
       {/* ================= MAIN GRID ================= */}
 
-      <div className="relative grid items-center gap-10 xl:min-h-[120VH] xl:grid-cols-[1.08fr_0.92fr] xl:gap-8 xl:pr-12 2xl:pr-20">
-        {/* Desktop dark organic panel (single SVG, no duplicates) */}
+      <div className="relative flex flex-col justify-center min-h-[100svh] md:min-h-0 md:py-16 lg:min-h-[95vh] xl:min-h-[100vh] 2xl:min-h-[105vh] lg:py-0">
+        {/* Full-width brand fill with a wave-shaped lower edge */}
         <svg
           aria-hidden="true"
-          className="pointer-events-none absolute -left-[3vw] -top-10 -z-10 hidden h-[calc(100%+70px)] w-[59%] overflow-visible xl:block"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-full w-full overflow-visible"
           viewBox="0 0 1000 1000"
           preserveAspectRatio="none"
           style={{ filter: "drop-shadow(15px 20px 30px var(--color-glow-primary))" }}
@@ -151,30 +353,55 @@ export function Hero() {
               <stop offset="100%" stopColor="var(--color-primary-muted)" stopOpacity="0" />
             </radialGradient>
           </defs>
-          <path
-            d="M 0 0 H 880 C 940 0 960 55 940 150 C 920 240 850 300 880 400 C 910 500 980 550 940 650 C 910 750 850 850 720 1000 H 0 Z"
+          <motion.path
+            d={FILL_A}
             fill="url(#uvokaHeroGradient)"
+            animate={reduced ? undefined : { d: [FILL_A, FILL_B, FILL_A] }}
+            transition={WAVE_MOVE}
           />
-          <path
-            d="M 0 0 H 880 C 940 0 960 55 940 150 C 920 240 850 300 880 400 C 910 500 980 550 940 650 C 910 750 850 850 720 1000 H 0 Z"
+          <motion.path
+            d={FILL_A}
             fill="url(#uvokaGlow)"
+            animate={reduced ? undefined : { d: [FILL_A, FILL_B, FILL_A] }}
+            transition={WAVE_MOVE}
+          />
+          {/* thin subtle gold accent line: draws itself once, then moves with the wave */}
+          <motion.path
+            d={LINE_A}
+            fill="none"
+            stroke="var(--color-gold)"
+            strokeOpacity="0.25"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            initial={{ pathLength: reduced ? 1 : 0 }}
+            animate={
+              reduced
+                ? { pathLength: 1 }
+                : { pathLength: 1, d: [LINE_A, LINE_B, LINE_A] }
+            }
+            transition={{
+              pathLength: { duration: reduced ? 0 : 2.2, delay: 0.6, ease: "easeInOut" },
+              d: WAVE_MOVE,
+            }}
           />
         </svg>
 
+        {/* drifting dots and sparkles */}
+        {!reduced && <BackgroundMotion />}
+
         {/* ================= LEFT CONTENT ================= */}
-        {/* On mobile/tablet the dark panel is the wrapper's own background */}
-        <div className="relative rounded-b-[40px] bg-gradient-to-br from-primary-dark via-primary to-bg-dark shadow-[0_25px_60px_var(--color-glow-primary)] xl:rounded-none xl:bg-none xl:shadow-none">
+        <div className="relative w-full">
           <Container className="relative z-10">
-            {/* CHANGED: extra top padding so the badge clears the fixed navbar */}
-            <div className="px-1 pb-12 pt-28 text-center sm:pt-32 xl:px-0 xl:pb-16 xl:pt-32 xl:pl-3 2xl:pl-5 2xl:pt-36 xl:text-left">
+            <div className="px-1 pt-24 pb-24 sm:pt-28 sm:pb-28 md:pt-28 md:pb-20 xl:px-0 xl:pt-24 xl:pb-20 xl:text-left">
               {/* Eyebrow */}
               <motion.div variants={fadeUp} initial="hidden" animate="visible">
-                <div className="mb-7 inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/25 bg-white/[0.07] px-4 py-2 backdrop-blur-md">
-                  <Sparkles className="h-4 w-4 shrink-0 text-gold" />
+                <div className="mb-5 inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/25 bg-white/[0.07] px-4 py-2 backdrop-blur-md sm:mb-7">
+                  <Sparkles className="h-4 w-4 shrink-0 text-white/75" />
                   <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white sm:text-xs">
-                    Premium LinkedIn Branding &amp; Lead Generation
+                    Leading LinkedIn Branding Agency
                   </span>
-                  <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-gold" />
+                  <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-400" />
                 </div>
               </motion.div>
 
@@ -184,51 +411,108 @@ export function Hero() {
                 initial="hidden"
                 animate="visible"
                 transition={{ delay: 0.12 }}
-                className="mx-auto max-w-[680px] font-heading text-[2.4rem] font-extrabold leading-[1.08] tracking-tight !text-white sm:text-5xl md:text-5xl xl:mx-0 xl:text-[3.5rem] 2xl:text-[4.25rem]"
+                className="mx-auto max-w-[900px] font-heading text-[2.15rem] font-extrabold leading-[1.1] tracking-tight !text-white sm:text-5xl sm:leading-[1.08] md:text-5xl xl:mx-0 xl:text-[3.5rem] 2xl:text-[4.25rem]"
               >
-                We Turn Industry Leaders into{" "}
-                <span className="relative inline-block font-editorial font-normal italic text-gold">
-                  Unrivaled Category
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 300 12"
-                    preserveAspectRatio="none"
-                    className="absolute -bottom-1 left-0 h-2 w-full"
+                <span className="sr-only">We build Legacies</span>
+                <span aria-hidden="true" className="inline-flex flex-wrap justify-center gap-x-[0.24em] xl:justify-start">
+                  {["We", "build"].map((word, index) => (
+                    <motion.span
+                      key={word}
+                      initial={false}
+                      animate={{ opacity: visibleWords > index ? 1 : 0, y: visibleWords > index ? 0 : 14 }}
+                      transition={{ duration: reduced ? 0 : 0.38, ease }}
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
+                  <motion.span
+                    initial={false}
+                    animate={{ opacity: visibleWords > 2 ? 1 : 0, y: visibleWords > 2 ? 0 : 14 }}
+                    transition={{ duration: reduced ? 0 : 0.38, ease }}
+                    className="inline-flex items-baseline font-editorial font-normal  text-gold"
                   >
-                    <path
-                      d="M2 8 C 60 1, 140 1, 298 7"
-                      fill="none"
-                      stroke="var(--color-gold)"
-                      strokeOpacity="0.6"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>{" "}
-                Authorities
+                    <span className="relative inline-block">
+                      {brandWord}
+                      <motion.span
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: isTypingComplete ? 1 : 0 }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute -bottom-1 left-0 right-0 h-[2.5px] origin-left rounded-full bg-[var(--color-gold)] pointer-events-none"
+                      />
+                    </span>
+                    {!isTypingComplete && (
+                      <motion.span
+                        animate={{ opacity: [1, 0, 1] }}
+                        transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+                        className="ml-[2px] inline-block h-[0.82em] w-[2px] translate-y-[0.08em] bg-[var(--color-gold)]"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </motion.span>
+                </span>
               </motion.h1>
 
-              {/* Description (CHANGED: !text-white/80 so global p styles can't dim it) */}
+              {/* Description */}
               <motion.p
-                variants={fadeUp}
+                custom={0.25}
+                variants={cascadeVariants}
                 initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.24 }}
-                className="mx-auto mt-7 max-w-[590px] text-sm leading-relaxed !text-white/80 sm:text-base md:text-lg xl:mx-0"
+                animate={isTypingComplete ? "visible" : "hidden"}
+                className="mx-auto mt-5 max-w-[760px] text-sm leading-relaxed !text-white/80 sm:mt-7 sm:text-base md:text-lg xl:mx-0"
               >
-                UVOKA architects high-impact personal brands and inbound
-                pipeline engines for founders, executives and global creators on
-                LinkedIn — driving verified authority, media resonance, and
-                multi-million dollar business opportunities.
+                We help Founders, Executives, Professionals and Companies build
+                LinkedIn presences that Lead, Influence and Last.
               </motion.p>
+
+              {/* Counter cards: frosted glass tiles */}
+              <div className="mx-auto mt-6 grid max-w-[760px] grid-cols-3 gap-2 text-center sm:mt-8 sm:gap-4 xl:mx-0">
+                {heroStats.map(({ value, suffix, label, icon: Icon }, index) => (
+                  <motion.div
+                    key={label}
+                    custom={0.55 + index * 0.25}
+                    variants={cascadeVariants}
+                    initial="hidden"
+                    animate={isTypingComplete ? "visible" : "hidden"}
+                    whileHover={reduced ? undefined : { y: -5 }}
+                    className="group relative flex flex-col items-center justify-center text-center min-w-0 overflow-hidden rounded-xl border border-white/15 bg-white/[0.07] p-2.5 backdrop-blur-md transition-colors hover:border-gold/50 hover:bg-white/[0.11] sm:rounded-3xl sm:p-5"
+                  >
+                    {/* glowing gold top edge */}
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent"
+                    />
+                    {/* corner glow */}
+                    <span
+                      aria-hidden="true"
+                      className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gold/20 blur-2xl transition-opacity duration-300 group-hover:opacity-100 sm:opacity-70"
+                    />
+
+                    <span className="relative mb-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white/75 ring-1 ring-white/20 sm:mb-4 sm:h-10 sm:w-10 mx-auto">
+                      <Icon aria-hidden="true" className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                    </span>
+
+                    <div className="relative text-center font-heading text-xl font-extrabold leading-none tabular-nums text-white sm:text-4xl">
+                      <AnimatedCounter
+                        key={isTypingComplete ? `active-${value}` : `wait-${value}`}
+                        value={value}
+                        suffix={suffix}
+                        duration={2.6}
+                      />
+                    </div>
+                    <p className="relative mt-1.5 text-[9px] text-center font-medium uppercase leading-snug tracking-[0.06em] !text-white/75 sm:mt-2 sm:text-xs sm:tracking-[0.08em]">
+                      {label}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
 
               {/* CTAs */}
               <motion.div
-                variants={fadeUp}
+                custom={1.35}
+                variants={cascadeVariants}
                 initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.36 }}
-                className="mt-9 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center xl:justify-start"
+                animate={isTypingComplete ? "visible" : "hidden"}
+                className="mt-7 flex flex-col items-stretch justify-center gap-3 sm:mt-9 sm:flex-row sm:items-center xl:justify-start"
               >
                 <MagneticButton>
                   <Button
@@ -238,7 +522,7 @@ export function Hero() {
                     icon={<ArrowRight className="h-4 w-4" />}
                     className="w-full border border-gold bg-gold text-bg-dark shadow-[0_10px_30px_var(--color-glow-gold)] hover:shadow-[0_14px_40px_var(--color-glow-gold)] sm:w-auto"
                   >
-                    Start Your Transformation
+                    Let&apos;s Build Your Brand
                   </Button>
                 </MagneticButton>
 
@@ -252,210 +536,23 @@ export function Hero() {
                 </Button>
               </motion.div>
 
-              {/* Trust row */}
-              {/* <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.65, duration: 0.8 }}
-                className="mt-12 grid grid-cols-3 border-t border-white/20 pt-7 text-left"
+              <motion.p
+                custom={1.6}
+                variants={cascadeVariants}
+                initial="hidden"
+                animate={isTypingComplete ? "visible" : "hidden"}
+                className="mx-auto mt-5 flex max-w-[760px] items-start justify-center gap-2 text-left text-xs leading-relaxed !text-white/80 sm:mt-6 sm:text-sm xl:mx-0 xl:justify-start"
               >
-                {trust.map(({ icon: Icon, value, label }, i) => (
-                  <div
-                    key={value}
-                    className={`flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3 ${
-                      i > 0 ? "border-l border-white/20 pl-3 sm:pl-5" : "pr-2"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5 shrink-0 text-gold sm:mt-1 sm:h-6 sm:w-6" />
-                    <div>
-                      <div className="font-heading text-lg font-bold text-white sm:text-2xl">
-                        {value}
-                      </div>
-                      <p className="mt-1 text-[10px] leading-snug text-white/70 sm:text-xs">
-                        {label}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </motion.div> */}
+                <ShieldCheck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-white/80" />
+                <span>
+                  <strong className="font-semibold text-white">Our Guarantee:</strong>{" "}
+                  100% increase in profile impressions in 30 days.
+                </span>
+              </motion.p>
             </div>
           </Container>
         </div>
-
-        {/* ================= RIGHT VISUAL ================= */}
-        {/* Desktop spacing keeps the profile card aligned with the copy. */}
-        <div
-          ref={visualRef}
-          className="relative mx-auto w-full min-w-0 max-w-[560px] px-4 pb-14 sm:px-0 xl:pb-10 xl:pt-24"
-        >
-          {/* gold ring */}
-          <div
-            aria-hidden="true"
-            className="absolute left-1/3 top-[38%] h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-gold/50 sm:h-[500px] sm:w-[500px]"
-          />
-          {/* purple glow */}
-          <div
-            aria-hidden="true"
-            className="absolute left-[10%] top-[18%] h-[300px] w-[300px] rounded-full bg-primary-muted/25 blur-[75px]"
-          />
-          {/* dot pattern */}
-          <div
-            aria-hidden="true"
-            className="absolute -left-1 top-[1%] hidden grid-cols-4 gap-3 opacity-50 sm:grid"
-          >
-            {Array.from({ length: 20 }).map((_, i) => (
-              <span key={i} className="h-2.5 w-2.5 rounded-full bg-primary-muted" />
-            ))}
-          </div>
-
-          {/* floating spheres */}
-          <motion.div
-            {...float(-14, 4)}
-            aria-hidden="true"
-            className="absolute right-2 top-[10%] z-20 h-7 w-7 rounded-full bg-gradient-to-br from-primary-muted to-primary-dark shadow-lg shadow-primary-dark/20"
-          />
-          <motion.div
-            {...float(12, 5)}
-            aria-hidden="true"
-            className="absolute left-0 top-[52%] z-20 h-6 w-6 rounded-full bg-gradient-to-br from-gold to-primary-muted shadow-lg"
-          />
-
-          {/* ---------- Profile card ---------- */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3, ease }}
-            className="relative z-10 mx-auto w-[100%] max-w-[480px] overflow-hidden rounded-[26px] border border-white/90 bg-white shadow-[0_30px_80px_var(--color-glow-primary)] ring-1 ring-primary/5"
-          >
-            {/* cover */}
-            <div
-              className="relative h-24 bg-cover bg-center sm:h-32 xl:h-40"
-              style={{
-                backgroundImage:
-                  "linear-gradient(90deg,var(--color-glow-primary),var(--color-glow-primary)),url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1000&q=85)",
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/35 to-transparent" />
-              <div className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-lg">
-                <LinkedInIcon className="h-5 w-5" />
-              </div>
-            </div>
-
-            <div className="relative px-4 pb-4 sm:px-5 sm:pb-5">
-              {/* avatar */}
-              <div
-                role="img"
-                aria-label="Professional executive portrait"
-                className="-mt-10 h-20 w-20 rounded-full border-4 border-white bg-cover bg-center shadow-lg"
-                style={{
-                  backgroundImage:
-                    "url(https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=85)",
-                }}
-              />
-
-              <div className="mt-2 flex items-center gap-1.5">
-                <h3 className="font-heading text-xl font-bold text-charcoal sm:text-2xl">
-                  Industry Leader
-                </h3>
-                <BadgeCheck
-                  size={17}
-                  className="text-primary"
-                  fill="var(--color-primary)"
-                  stroke="white"
-                />
-              </div>
-
-              <p className="mt-1 text-xs font-medium text-text-secondary sm:text-sm">
-                Founder &amp; CEO | Building What&apos;s Next
-              </p>
-
-              <div className="mt-1 text-xs text-primary sm:text-sm">
-                <span>500+ connections</span>
-              </div>
-
-              <div className="mt-3 flex gap-2">
-                <div className="flex-1 rounded-full bg-primary px-3 py-2 text-center text-xs font-semibold text-white shadow-md sm:text-sm">
-                  Connect
-                </div>
-                <div className="flex-1 rounded-full border border-primary px-3 py-2 text-center text-xs font-semibold text-primary sm:text-sm">
-                  Message
-                </div>
-              </div>
-
-              {/* engagement strip */}
-              <div className="mt-3 flex items-center justify-between rounded-lg bg-ivory px-2.5 py-2 text-[9px] font-medium text-primary-dark sm:text-[10px]">
-                <span>12.4K likes</span>
-                <span>860 comments</span>
-                <span>2.1K reposts</span>
-              </div>
-
-              <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-                <span className="text-[9px] font-bold tracking-[0.13em] text-text-muted sm:text-[10px]">
-                  PERSONAL BRAND AUTHORITY
-                </span>
-                <span className="text-xs font-bold text-gold">UVOKA</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ---------- Floating stat chips ---------- */}
-          <motion.div
-            variants={chipsContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            className="relative z-20 isolate mx-auto mt-7 grid w-full max-w-[560px] grid-cols-4 gap-4 pb-6 sm:mt-8 sm:gap-6 sm:pb-10"
-          >
-            <svg
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-0 h-full w-full"
-              viewBox="0 0 300 150"
-              preserveAspectRatio="none"
-            >
-              <path
-                d="M 5 5 C 5 240 295 240 295 5"
-                fill="none"
-                stroke="var(--color-gold)"
-                strokeOpacity="0.55"
-                strokeWidth="2"
-              />
-            </svg>
-            {floatingStats.map(({ value, label, tone }, index) => (
-              <motion.div
-                key={label}
-                variants={chip}
-                className={`relative z-10 flex aspect-square min-w-0 flex-col items-center justify-center rounded-full border bg-white/95 p-2 text-center shadow-[0_10px_24px_var(--color-glow-primary)] backdrop-blur-xl sm:p-3 ${
-                  index === 1 || index === 2 ? "translate-y-6 sm:translate-y-10" : "-translate-y-2 sm:-translate-y-4"
-                } ${
-                  tone === "gold" ? "border-gold/50" : "border-white"
-                }`}
-              >
-                <div className="font-heading text-base font-extrabold text-primary-dark sm:text-lg">
-                  {value}
-                </div>
-                <p className="mt-1 max-w-[8em] text-[10px] font-medium leading-tight text-text-secondary sm:text-xs">
-                  {label}
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* ================= SCROLL CUE ================= */}
-        {/* Desktop scroll cue sits over the dark panel. */}
-        {/* <motion.button
-          type="button"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-          onClick={scrollToWork}
-          className="mx-auto mb-8 mt-6 flex flex-col items-center gap-3 text-[10px] font-semibold tracking-[0.28em] text-[var(--color-primary)] transition-opacity hover:opacity-60 xl:text-white/80"
-        >
-          <span>EXPLORE OUR WORK</span>
-          <ArrowDown className="h-4 w-4 animate-bounce" />
-        </motion.button> */}
       </div>
-      {/* <FeaturedIn/> */}
     </section>
   );
 }

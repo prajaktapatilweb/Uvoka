@@ -15,13 +15,14 @@ import { PressRelease } from "@/components/home/PressRelease";
 import { CTA } from "@/components/home/CTA";
 import { FAQ } from "@/components/home/FAQ";
 import FavikonCounter from "@/components/home/Favikon";
+import { Hero1 } from "@/components/home/Hero1";
 
 export default function Home() {
   return (
     <div className="flex flex-col w-full">
       {/* ── 01. Hero Section ── */}
       <Hero />
-
+   
       {/* ── 02. Featured In / Media Recognition ── */}
       <FeaturedIn />
 
@@ -44,7 +45,7 @@ export default function Home() {
 
 
       {/* ── 07. Current Package / Special Discount Offer ── */}
-      <SpecialOffer />
+      {/* <SpecialOffer /> */}
 
       {/* ── 08. Add-ons ── */}
       {/* <AddOns /> */}

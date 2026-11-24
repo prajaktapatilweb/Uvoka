@@ -25,7 +25,7 @@ export interface StatisticItem {
 export const STATISTICS: StatisticItem[] = [
   {
     id: "views",
-    value: 50,
+    value: 100,
     suffix: "M+",
     label: "Organic Views Generated",
     description: "High-impact narrative distribution across executive networks",
