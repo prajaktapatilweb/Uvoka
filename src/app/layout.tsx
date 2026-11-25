@@ -23,7 +23,7 @@ const dmSans = DM_Sans({
 const playfairDisplay = Playfair_Display({
   variable: "--font-editorial",
   subsets: ["latin"],
-  weight: ["400", "600"],
+  weight: ["400", "600", "700", "800", "900"],
   style: ["normal", "italic"],
   display: "swap",
 });

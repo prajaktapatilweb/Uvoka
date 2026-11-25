@@ -192,7 +192,7 @@ export function HeroNew() {
                     transition={{ duration: reduced ? 0 : 0.6, delay: reduced ? 0 : 1, ease: "easeOut" }}
                   />
                 </span>
-                  <span className="block font-extrabold text-[1.15em]">We build</span>
+                  <span className="block font-editorial font-black text-[1.22em] tracking-tight text-[#131214]">We build</span>
               <span className="sr-only">We build Legacies.</span>
              
                 <span className="relative block w-fit  font-editorial font-extrabold  text-[var(--brand-purple)] max-lg:mx-auto">
@@ -221,7 +221,7 @@ export function HeroNew() {
               initial={{ opacity: 0, y: reduced ? 0 : 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: reduced ? 0 : 0.75, delay: reduced ? 0 : 0.2, ease }}
-              className="mx-auto mt-8 max-w-xl text-base leading-[1.65] text-[var(--brand-charcoal)]/80 sm:text-lg lg:mx-0"
+              className="mx-auto mt-8 max-w-xl text-base leading-[1.65] text-[var(--brand-charcoal)]/90 sm:text-lg lg:mx-0" style={{color:'#131214'}}
             >
               We help founders, executives, professionals and companies build LinkedIn presences that lead, influence and last.
             </motion.p>
@@ -240,7 +240,7 @@ export function HeroNew() {
                   icon={<ArrowRight className="h-4 w-4" />}
                   className="w-full sm:w-auto "
                 >
-                  Build your legacy
+                Let's Build Your Brand
                 </Button>
               </MagneticButton>
             </motion.div>
@@ -250,7 +250,7 @@ export function HeroNew() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: reduced ? 0 : 0.8, delay: reduced ? 0 : 0.48 }}
-              className="mt-9 grid max-w-xl grid-cols-3 rounded-[10px]  border border-[var(--brand-purple)]/15 bg-white/60 py-4 shadow-[0_10px_30px_rgba(82,33,102,0.06)] backdrop-blur-md sm:mt-12 max-lg:mx-auto"
+              className="mt-9 grid max-w-xl grid-cols-3 rounded-[10px]  border border-[var(--brand-purple)]/15 bg-white/60 py-4   sm:mt-12 max-lg:mx-auto  shadow-[8px_8px_6px_#ddd,8px_6px_20px_#fff]"
             >
               {stats.map((stat, index) => (
                 <div
@@ -315,7 +315,7 @@ export function HeroNew() {
               >
                 <BadgeCheck className="h-4 w-4 text-[var(--brand-purple)]" />
                 <span className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--brand-purple)]">
-                  Category Leader • Top 1% Voice
+                Our Guarantee: 100% increase in profile impressions in 30 days
                 </span>
               </motion.div>
             </motion.div>

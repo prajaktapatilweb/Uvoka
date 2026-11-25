@@ -8,21 +8,6 @@ import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { AnimatedCard } from "@/components/animations/AnimatedCard";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
-const STAT_ACCENTS = [
-  "text-primary",
-  "text-primary-dark",
-  "text-primary-muted",
-  "text-gold",
-];
-
-/*
-  One static wave edge (it does not move). x=100 is where the number circle sits.
-  The bottom of the wave sits further LEFT than the top.
-  For more curve, push the control-point x values further apart
-  (88 / 132 / 80 / 112); for less curve, bring them closer to 100.
-*/
-const WAVE = "M 116 0 C 88 14, 132 36, 106 50 C 80 64, 112 86, 84 100 L 200 100 L 200 0 Z";
-
 export function ResultsCounter() {
   const reduced = useReducedMotion();
 
@@ -36,116 +21,123 @@ export function ResultsCounter() {
 
       <Container>
         <SectionHeading
-          eyebrow="Measurable Business Impact"
+          eyebrow="Proven Results"
           title="Results That Speak for Themselves"
           italicPhrase="Speak for Themselves"
-          subtitle="Every narrative sprint, ghostwritten piece, and outbound interaction is engineered for verifiable reach, engagement quality, and pipeline velocity."
+          subtitle="Our proven methodology turns LinkedIn profiles into lead magnets all organically without spending $$$ on ads."
         />
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+        {/* 1 column on phones/tablets, 3 across on desktop */}
+        <div className="mx-auto grid max-w-md grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3 lg:gap-8">
           {STATISTICS.map((stat, idx) => (
             <AnimatedCard
               key={stat.id}
               delay={idx * 0.1}
               enableTilt={true}
-              className="flex min-h-44 overflow-hidden p-0 text-left sm:min-h-48"
+              className="group flex flex-col items-center justify-between rounded-3xl border border-[var(--color-border)]/80 bg-white p-8 text-center shadow-[0_10px_30px_rgba(82,33,102,0.04)] transition-all duration-300 hover:border-gold/50 hover:shadow-[0_20px_45px_rgba(82,33,102,0.10)] sm:p-10"
             >
-              {/* text */}
-              <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center py-6 pl-6 pr-20 sm:py-7 sm:pl-8 sm:pr-20">
-                <h4 className="font-heading text-base font-bold text-charcoal sm:text-lg">
-                  {stat.label}
-                </h4>
-                <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                  {stat.description}
-                </p>
-              </div>
-
-              {/* wavy panel + number */}
-              <div
-                className={`relative w-28 shrink-0 sm:w-40 ${STAT_ACCENTS[idx % STAT_ACCENTS.length]}`}
-              >
-                <svg
+              {/* ===== Centered Round Badge with Animated Gold Ring ===== */}
+              <div className="relative flex items-center justify-center pt-2 pb-4">
+                {/* Ambient soft glow behind badge on hover */}
+                <span
                   aria-hidden="true"
-                  viewBox="0 0 200 100"
-                  preserveAspectRatio="none"
-                  className="absolute -left-full top-0 h-full w-[200%] overflow-visible"
-                >
-                  <path d={WAVE} fill="currentColor" />
-                </svg>
+                  className="pointer-events-none absolute h-36 w-36 rounded-full bg-gold/15 blur-2xl transition-opacity duration-300 opacity-60 group-hover:opacity-100"
+                />
 
-                {/* round number badge */}
+                {/* Badge Container */}
                 <motion.div
-                  initial={{ opacity: 0, scale: reduced ? 1 : 0.5 }}
+                  initial={{ opacity: 0, scale: reduced ? 1 : 0.6 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{
                     type: "spring",
                     stiffness: 160,
                     damping: 14,
-                    delay: 0.2 + idx * 0.1,
+                    delay: 0.15 + idx * 0.1,
                   }}
-                  className="absolute left-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+                  className="relative flex h-36 w-36 items-center justify-center"
                 >
-                  {/* gentle float */}
-                  <motion.div
-                    animate={reduced ? undefined : { y: [0, -5, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: idx * 0.3 }}
-                    className="relative flex h-28 w-28 items-center justify-center sm:h-32 sm:w-32"
+                  {/* Circular Gold Progress Ring (Animated Fill) */}
+                  <svg
+                    aria-hidden="true"
+                    className="absolute -inset-1 h-[calc(100%+8px)] w-[calc(100%+8px)] -rotate-90 pointer-events-none"
+                    viewBox="0 0 120 120"
                   >
-                    {/* soft glow that breathes (filled, not a ring) */}
-                    {!reduced && (
-                      <motion.span
-                        aria-hidden="true"
-                        className="absolute inset-0 rounded-full bg-current"
-                        animate={{ scale: [1, 1.25], opacity: [0.22, 0] }}
-                        transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut", delay: idx * 0.3 }}
-                      />
-                    )}
+                    <defs>
+                      <linearGradient id={`goldGrad-${idx}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="var(--color-gold, #D2B98B)" />
+                        <stop offset="60%" stopColor="#E2CA9E" />
+                        <stop offset="100%" stopColor="var(--color-gold, #D2B98B)" />
+                      </linearGradient>
+                      <filter id={`goldGlow-${idx}`} x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#D2B98B" floodOpacity="0.45" />
+                      </filter>
+                    </defs>
 
-                    {/* the round badge: glossy, with a soft coloured glow shadow */}
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-0 overflow-hidden rounded-full bg-gradient-to-br from-white via-white to-[var(--color-ivory)] shadow-[0_14px_38px_-8px_currentColor,0_6px_16px_rgba(39,35,42,0.16),inset_0_2px_5px_rgba(255,255,255,1),inset_0_-8px_16px_rgba(39,35,42,0.07)] ring-1 ring-white"
-                    >
-                      {/* gloss highlight on the top-left */}
-                      <span className="absolute left-[12%] top-[6%] h-[38%] w-[62%] rounded-full bg-gradient-to-b from-white to-transparent opacity-90" />
-                      {/* light sweep that glides across now and then */}
-                      {/* {!reduced && (
-                        <motion.span
-                          className="absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-gold/40 to-transparent"
-                          animate={{ x: ["0%", "480%"] }}
-                          transition={{
-                            duration: 1.4,
-                            repeat: Infinity,
-                            repeatDelay: 3.2,
-                            ease: "easeInOut",
-                            delay: 1 + idx * 0.5,
-                          }}
-                        />
-                      )} */}
-                    </span>
+                    {/* Background Ring Track */}
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="52"
+                      fill="none"
+                      stroke="var(--color-border, #E5E0EA)"
+                      strokeWidth="3.5"
+                      strokeOpacity="0.6"
+                    />
 
-                    {/* the number */}
-                    <span className="relative px-2 text-center">
-                      <AnimatedCounter
-                        value={stat.value}
-                        suffix={stat.suffix}
-                        duration={2.2}
-                        className="font-heading text-3xl font-extrabold leading-none text-primary-dark sm:text-4xl"
-                      />
-                    </span>
-                  </motion.div>
+                    {/* Animated Gold Fill Ring */}
+                    <motion.circle
+                      cx="60"
+                      cy="60"
+                      r="52"
+                      fill="none"
+                      stroke={`url(#goldGrad-${idx})`}
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      filter={`url(#goldGlow-${idx})`}
+                      initial={{ pathLength: reduced ? 1 : 0 }}
+                      whileInView={{ pathLength: 1 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{
+                        duration: reduced ? 0 : 2.2,
+                        delay: 0.2 + idx * 0.15,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                    />
+                  </svg>
+
+                  {/* Inner Round Badge with subtle gloss and depth */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-1.5 overflow-hidden rounded-full bg-gradient-to-br from-white via-white to-[var(--color-ivory)] shadow-[0_10px_25px_rgba(39,35,42,0.10),inset_0_2px_4px_rgba(255,255,255,1),inset_0_-4px_10px_rgba(39,35,42,0.05)] ring-2 ring-white"
+                  >
+                    {/* Gloss specular highlight on top */}
+                    <span className="absolute left-[15%] top-[8%] h-[35%] w-[60%] rounded-full bg-gradient-to-b from-white to-transparent opacity-90" />
+                  </span>
+
+                  {/* The Counter Number */}
+                  <span className="relative z-10 px-2 text-center">
+                    <AnimatedCounter
+                      value={stat.value}
+                      suffix={stat.suffix}
+                      duration={2.2}
+                      className="font-heading text-4xl font-extrabold leading-none text-primary-dark"
+                    />
+                  </span>
                 </motion.div>
+              </div>
+
+              {/* ===== Text Section ===== */}
+              <div className="flex flex-1 flex-col items-center pt-2">
+                <h4 className="font-heading text-lg font-bold text-charcoal sm:text-xl">
+                  {stat.label}
+                </h4>
+                <p className="mt-2.5 max-w-xs text-sm leading-relaxed text-text-secondary">
+                  {stat.description}
+                </p>
               </div>
             </AnimatedCard>
           ))}
-        </div>
-
-        {/* Client Transparency Note */}
-        <div className="mt-10 text-center">
-          {/* <p className="text-xs text-[var(--color-text-muted)] font-mono">
-            * Aggregated performance metrics across active founder, executive & creator sprints.
-          </p> */}
         </div>
       </Container>
     </section>

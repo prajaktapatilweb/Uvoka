@@ -28,29 +28,29 @@ export const STATISTICS: StatisticItem[] = [
     value: 100,
     suffix: "M+",
     label: "Organic Views Generated",
-    description: "High-impact narrative distribution across executive networks",
+    description: "Massive reach without paid ads",
   },
   {
     id: "clients",
     value: 120,
     suffix: "+",
     label: "Founders & Brands Scaled",
-    description: "Across technology, SaaS, venture capital, and enterprise B2B",
+    description: "Featured in top publications",
   },
   {
     id: "countries",
     value: 14,
     suffix: "",
     label: "Countries Reached",
-    description: "International thought leadership with global audience resonance",
+    description: "Dramatic visibility boost",
   },
-  {
-    id: "growth",
-    value: 340,
-    suffix: "%",
-    label: "Avg. Impression Growth",
-    description: "Measured over 90-day custom authority positioning sprints",
-  },
+  // {
+  //   id: "growth",
+  //   value: 340,
+  //   suffix: "%",
+  //   label: "Avg. Impression Growth",
+  //   description: "Measured over 90-day custom ",
+  // },
 ];
 
 export interface ClientAchievement {

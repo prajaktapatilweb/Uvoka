@@ -58,7 +58,7 @@ export function FeaturedIn() {
           <div>
             <h2
               id="featured-heading"
-              className="font-heading text-3xl font-semibold tracking-tight text-white md:text-5xl" style={{ color: "white" }}
+              className="font-editorial text-3xl font-semibold tracking-tight text-white md:text-5xl" style={{ color: "white" }}
             >
               As Featured In
             </h2>

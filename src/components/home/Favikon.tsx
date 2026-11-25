@@ -32,10 +32,10 @@ export default function FavikonCounter() {
       <Container className="relative">
         <SectionHeadingcopy
           eyebrow="Favikon Creator Rankings"
-          title="Our clients rank among the best on Favikon"
-          highlight="among the best"
+          title="Our Clients Top on Favikon"
+          highlight="Top on Favikon"
           highlightColor="gold"
-          subtitle="Favikon ranks the top creators on LinkedIn. These are the positions our clients hold in their regions."
+          subtitle="Our clients have achieved remarkable recognition on LinkedIn, being featured among the top creators on Favikon."
           align="left"
           darkTheme
           className="mb-12 max-w-2xl md:mb-16"

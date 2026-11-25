@@ -76,7 +76,7 @@ export function AnimatedCard({
         transformStyle: "preserve-3d",
         perspective: 1000,
       }}
-      className={`relative rounded-2xl md:rounded-3xl border border-[var(--color-border)] bg-white/85 backdrop-blur-md transition-shadow duration-300 hover:shadow-[0_16px_40px_rgba(82,33,102,0.08)] hover:border-[var(--color-primary)]/30 ${className}`}
+      className={`relative rounded-2xl md:rounded-3xl border border-[var(--color-primary)]/40 bg-white/85 backdrop-blur-md transition-shadow duration-300 hover:shadow-[0_16px_40px_rgba(82,33,102,0.08)] hover:border-[var(--color-primary)]/30 ${className}`}
     >
       {/* Dynamic Cursor Light Sheen */}
       {enableTilt && (
