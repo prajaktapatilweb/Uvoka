@@ -51,7 +51,8 @@ export function MagneticButton({
         damping: 18,
         mass: 0.12,
       }}
-      className={`inline-block ${className}`}
+      className={`inline-block ${className}` }
+      
     >
       {children}
     </motion.div>

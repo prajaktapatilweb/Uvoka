@@ -30,7 +30,7 @@ export function FeaturedIn() {
     <section
       id="featured-section"
       aria-labelledby="featured-heading"
-      className="relative z-10 -mt-6 overflow-hidden text-white"
+      className="relative z-10 -mt-15 overflow-hidden text-white"
     >
       {/* soft glow, same family as the hero's curved shape */}
       {/* <div
@@ -43,7 +43,7 @@ export function FeaturedIn() {
         className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent"
       /> */}
 
-      <Container  className="relative isolate overflow-hidden rounded-2xl px-0 py-0 sm:px-0 md:px-0 lg:px-0">
+      <Container  className="relative isolate overflow-hidden rounded-[10px] px-0 py-0 sm:px-0 md:px-0 lg:px-0">
         <motion.div
           aria-hidden="true"
           className="absolute -inset-1/6 z-0"
@@ -91,7 +91,7 @@ export function FeaturedIn() {
                   href={logo.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative block h-28 w-full rounded-xl bg-white p-4 shadow-lg ring-1 ring-white/10 transition duration-300 hover:-translate-y-1 hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                  className="group relative block h-28 w-full rounded-[10px] bg-white p-4 shadow-lg ring-1 ring-white/10 transition duration-300 hover:-translate-y-1 hover:ring-2 hover:ring-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                 >
                   <Image
                     src={logo.src}

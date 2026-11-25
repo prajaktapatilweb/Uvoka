@@ -16,12 +16,16 @@ import { CTA } from "@/components/home/CTA";
 import { FAQ } from "@/components/home/FAQ";
 import FavikonCounter from "@/components/home/Favikon";
 import { Hero1 } from "@/components/home/Hero1";
+import { HeroNew } from "@/components/home/HeroNew";
+import { HeroNew1 } from "@/components/home/Hero copy";
 
 export default function Home() {
   return (
     <div className="flex flex-col w-full">
       {/* ── 01. Hero Section ── */}
-      <Hero />
+      <HeroNew/>
+      
+      {/* <Hero /> */}
    
       {/* ── 02. Featured In / Media Recognition ── */}
       <FeaturedIn />
