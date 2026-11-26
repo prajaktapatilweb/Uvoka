@@ -2,7 +2,6 @@ import { Hero } from "@/components/home/Hero";
 import { FeaturedIn } from "@/components/home/FeaturedIn";
 import { ResultsCounter } from "@/components/home/ResultsCounter";
 import { ClientRecognition} from "@/components/home/ClientRecognition";
-import { ClientRecognition11 } from "@/components/oldfile/ClientRecognition11";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Services } from "@/components/home/Services";
 import { SpecialOffer } from "@/components/home/SpecialOffer";
@@ -23,6 +22,7 @@ import { ResultsCounter1 } from "@/components/home/ResultsCounter copy";
 import { ServicesShowcase } from "@/components/home/ServicesShowcase";
 import { BlogCard } from "@/components/blogs/BlogCard";
 import { FounderSection } from "@/components/home/Foundersection";
+import { TeamScene } from "@/components/home/TeamScene";
 
 export default function Home() {
   return (

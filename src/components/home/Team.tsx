@@ -1,27 +1,77 @@
 "use client";
 
+import { useRef } from "react";
+import { useInView } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import { TEAM_CAPABILITIES } from "@/data/homeData";
 import { Container } from "@/components/common/Container";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { Badge } from "@/components/common/Badge";
 import { AnimatedCard } from "@/components/animations/AnimatedCard";
+import { SCENE_TINT, TeamScene, sceneKindFor } from "./TeamScene";
 
-// Abstract geometric avatars for each creative discipline (No fictional photos/names per global rules)
-const DISCIPLINE_AVATARS = [
-  <div key="1" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white flex items-center justify-center font-heading font-extrabold text-xl shadow-md">
-    CS
-  </div>,
-  <div key="2" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-gold)] to-[#b8955c] text-[var(--color-charcoal)] flex items-center justify-center font-heading font-extrabold text-xl shadow-md">
-    CD
-  </div>,
-  <div key="3" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-primary-dark)] to-[#1d0e24] text-[var(--color-gold)] flex items-center justify-center font-heading font-extrabold text-xl shadow-md">
-    LG
-  </div>,
-  <div key="4" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-primary-muted)] to-[var(--color-primary)] text-white flex items-center justify-center font-heading font-extrabold text-xl shadow-md">
-    GA
-  </div>,
-];
+type TeamItem = (typeof TEAM_CAPABILITIES)[number];
+
+function TeamCard({ team, idx }: { team: TeamItem; idx: number }) {
+  const sceneRef = useRef<HTMLDivElement>(null);
+  // the cartoon only animates while its card is on screen
+  const inView = useInView(sceneRef, { margin: "-10% 0px" });
+  const kind = sceneKindFor(team.role, idx);
+
+  return (
+    <AnimatedCard
+      delay={idx * 0.1}
+      enableTilt={true}
+      className="p-3 flex flex-col justify-between group overflow-hidden"
+    >
+      <div className="space-y-1">
+        {/* Animated cartoon scene + headcount badge */}
+        <div
+          ref={sceneRef}
+          className={`relative h-44 overflow-hidden rounded-[10px] border border-[var(--color-border)] ${SCENE_TINT[kind]}`}
+        >
+          <div
+            aria-hidden="true"
+            className="absolute -right-6 -top-6 h-24 w-24 rounded-[10px] border border-[var(--color-gold)]/40"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -bottom-8 -left-6 h-24 w-24 rounded-[10px] bg-[var(--color-primary-muted)]/15 blur-2xl"
+          />
+          <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+            <TeamScene role={team.role} index={idx} play={inView} />
+          </div>
+          <Badge
+            variant="ivory"
+            size="sm"
+            className="absolute right-3 top-3 font-mono text-[11px] font-semibold"
+          >
+            {team.count}
+          </Badge>
+        </div>
+
+        <div>
+          <h4 className="font-heading font-bold text-lg text-[var(--color-charcoal)] group-hover:text-[var(--color-primary)] transition-colors leading-snug">
+            {team.role}
+          </h4>
+          <p className="text-xs text-[var(--color-text-secondary)] mt-2.5 leading-relaxed">
+            {team.description}
+          </p>
+        </div>
+      </div>
+
+      {/* Capabilities bullet list */}
+      <div className="mt-6 pt-4 border-t border-[var(--color-border)]/70 space-y-2">
+        {(team.capabilities || []).map((cap, cIdx) => (
+          <div key={cIdx} className="flex items-center gap-2 text-xs text-[var(--color-charcoal)] font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
+            <span>{cap}</span>
+          </div>
+        ))}
+      </div>
+    </AnimatedCard>
+  );
+}
 
 export function Team() {
   return (
@@ -40,47 +90,10 @@ export function Team() {
           subtitle="The brilliant minds transforming LinkedIn profiles into powerful personal brands."
         />
 
-        {/* 4 Creative Discipline Capability Cards with 3D Mouse Tilt */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Creative discipline cards with animated cartoon scenes and 3D mouse tilt */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {TEAM_CAPABILITIES.map((team, idx) => (
-            <AnimatedCard
-              key={team.id}
-              delay={idx * 0.1}
-              enableTilt={true}
-              className="p-7 flex flex-col justify-between group overflow-hidden"
-            >
-              <div className="space-y-5">
-                {/* Abstract Avatar & Discipline Count */}
-                <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4">
-                  <div className="transition-transform duration-300 group-hover:scale-105">
-                    {DISCIPLINE_AVATARS[idx % DISCIPLINE_AVATARS.length]}
-                  </div>
-
-                  <Badge variant="ivory" size="sm" className="font-mono text-[11px] font-semibold">
-                    {team.count}
-                  </Badge>
-                </div>
-
-                <div>
-                  <h3 className="font-heading font-bold text-lg text-[var(--color-charcoal)] group-hover:text-[var(--color-primary)] transition-colors leading-snug">
-                    {team.role}
-                  </h3>
-                  <p className="text-xs text-[var(--color-text-secondary)] mt-2.5 leading-relaxed">
-                    {team.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* Capabilities bullet list */}
-              <div className="mt-6 pt-4 border-t border-[var(--color-border)]/70 space-y-2">
-                {(team.capabilities || []).map((cap, cIdx) => (
-                  <div key={cIdx} className="flex items-center gap-2 text-xs text-[var(--color-charcoal)] font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
-                    <span>{cap}</span>
-                  </div>
-                ))}
-              </div>
-            </AnimatedCard>
+            <TeamCard key={team.id} team={team} idx={idx} />
           ))}
         </div>
       </Container>

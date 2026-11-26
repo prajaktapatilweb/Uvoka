@@ -429,14 +429,14 @@ export const TEAM_CAPABILITIES: TeamCategory[] = [
   },
   {
     id: "team-3",
-    role: "Lead Generation Specialists",
+    role: "Video Editor",
     count: "3 Directors",
     description: "Outbound and inbound funnel strategists managing high-touch executive discovery, comment funnels, and enterprise meeting booking.",
     capabilities: ["Relationship Nurturing", "Pipeline Attribution", "Outbound Strategy"],
   },
   {
     id: "team-4",
-    role: "Growth & Analytics Analysts",
+    role: "Community Manager",
     count: "2 Analysts",
     description: "Data specialists continuously dissecting LinkedIn algorithm changes, engagement retention, and demographic audience resonance.",
     capabilities: ["Algorithm Tracking", "Audience Demographics", "ROI Attribution"],
