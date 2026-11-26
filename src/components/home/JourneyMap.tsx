@@ -6,15 +6,14 @@ import {
   AnimatePresence,
   motion,
   useInView,
+  useMotionValue,
   useMotionValueEvent,
-  useScroll,
   useSpring,
   useTransform,
 } from "framer-motion";
 import {
   CalendarDays,
   Check,
-  ChevronDown,
   Layers,
   MessagesSquare,
   PhoneCall,
@@ -23,9 +22,10 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/common/Container";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { SectionHeadingcopy } from "../common/SectionHeadingcopy";
 
-/* Put the white logo at /public/logo/uvoka-icon-white.png */
-const LOGO_SRC = "/logo/uvoka-icon-white.png";
+/* Put the logo at /public/logo/uvoka-icon.png (white logo with a transparent background) */
+const LOGO_SRC = "/images/uvoka-icon.png";
 
 /* How tall the desktop scroll area is. The circle stays in view while you scroll
    through (DESKTOP_SCROLL_VH - 100)vh. Lower = shorter, higher = slower. */
@@ -76,20 +76,69 @@ const COMPLETE = 0.93; // when the whole journey is finished
 
 /* node positions on the circle (percent of the square box), starting at 12 o'clock */
 const RADIUS = 42;
+const angleOf = (i: number) => -90 + i * 60;
 const NODES = STEPS.map((_, i) => {
-  const a = ((-90 + i * 60) * Math.PI) / 180;
+  const a = (angleOf(i) * Math.PI) / 180;
   return {
     x: +(50 + RADIUS * Math.cos(a)).toFixed(2),
     y: +(50 + RADIUS * Math.sin(a)).toFixed(2),
   };
 });
 
+/* the round purple badge that holds the logo */
+const logoBadge =
+  "bg-gradient-to-br from-primary-muted to-primary ring-2 ring-white shadow-[0_0_0_7px_rgba(255,255,255,0.14),0_12px_32px_rgba(0,0,0,0.45)]";
+
 const nodeStyle: Record<StepState, string> = {
-  idle: "border border-white/20 bg-white/10 text-white/50 backdrop-blur-sm",
-  active:
-    "border border-white bg-white text-primary-dark shadow-[0_0_40px_rgba(255,255,255,0.45),0_0_0_7px_rgba(255,255,255,0.15)]",
-  done: "border border-white/40 bg-white/20 text-white",
+  idle: "border-2 border-white/25 bg-white/10 text-white/60 backdrop-blur-sm",
+  active: "border-2 border-white bg-white text-primary-dark",
+  done: "border-2 border-white/45 bg-white/20 text-white",
 };
+
+/* =====================================================================
+   Live scroll progress.
+   It measures the element on every scroll (and whenever the page layout
+   changes), so it never goes out of date and it works the same way
+   scrolling down, up, and again.
+   ===================================================================== */
+const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
+/* desktop: 0 when the pinned area starts, 1 when it ends */
+const deskProgress = (r: DOMRect, vh: number) => clamp01(-r.top / Math.max(1, r.height - vh));
+/* mobile: the line tip is kept at 55% of the screen height */
+const mobProgress = (r: DOMRect, vh: number) => clamp01((0.55 * vh - r.top) / Math.max(1, r.height));
+
+function useLiveProgress(
+  ref: React.RefObject<HTMLElement | null>,
+  calc: (r: DOMRect, vh: number) => number,
+) {
+  const mv = useMotionValue(0);
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const el = ref.current;
+      if (el) mv.set(calc(el.getBoundingClientRect(), window.innerHeight));
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    window.addEventListener("pageshow", schedule);
+    const ro = new ResizeObserver(schedule);
+    if (ref.current) ro.observe(ref.current);
+    ro.observe(document.body); // content above changed height
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("pageshow", schedule);
+      ro.disconnect();
+    };
+  }, [ref, calc, mv]);
+  return mv;
+}
 
 /* =====================================================================
    DESKTOP: circular journey (1024px and up)
@@ -100,10 +149,7 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
   const [active, setActive] = useState(-1);
   const [complete, setComplete] = useState(false);
 
-  const { scrollYProgress } = useScroll({
-    target: wrapRef,
-    offset: ["start start", "end end"],
-  });
+  const progress = useLiveProgress(wrapRef, deskProgress);
 
   const compute = (p: number) => {
     let a = -1;
@@ -113,13 +159,36 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
     setActive(a);
     setComplete(p >= COMPLETE);
   };
-  useMotionValueEvent(scrollYProgress, "change", compute);
-  useEffect(() => compute(scrollYProgress.get()), []); // eslint-disable-line react-hooks/exhaustive-deps
+  useMotionValueEvent(progress, "change", compute);
+  useEffect(() => compute(progress.get()), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // the path reaches step i exactly when step i activates (i / 6 of the circle)
-  const path = useTransform(scrollYProgress, [T[0], T[5], COMPLETE], [0, 5 / 6, 1]);
-  const smooth = useSpring(path, { stiffness: 110, damping: 24, mass: 0.5 });
-  const pathLength = reduced ? path : smooth;
+  const path = useTransform(progress, [T[0], T[5], COMPLETE], [0, 5 / 6, 1]);
+  const smoothPath = useSpring(path, { stiffness: 110, damping: 24, mass: 0.5 });
+  const pathLength = reduced ? path : smoothPath;
+
+  // the logo marker glides around the ring to the active step
+  const angle = useMotionValue(angleOf(0));
+  const smoothAngle = useSpring(angle, { stiffness: 80, damping: 18, mass: 0.6 });
+  const markerAngle = reduced ? angle : smoothAngle;
+  useEffect(() => {
+    angle.set(angleOf(Math.max(0, active)));
+  }, [active, angle]);
+  const markerLeft = useTransform(markerAngle, (a) => `${50 + RADIUS * Math.cos((a * Math.PI) / 180)}%`);
+  const markerTop = useTransform(markerAngle, (a) => `${50 + RADIUS * Math.sin((a * Math.PI) / 180)}%`);
+
+  /* click a step: scroll to the exact place where that step is active */
+  const goTo = (i: number) => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    const scrollable = el.offsetHeight - window.innerHeight;
+    const next = i < 5 ? T[i + 1] : COMPLETE;
+    window.scrollTo({
+      top: top + scrollable * ((T[i] + next) / 2),
+      behavior: reduced ? "auto" : "smooth",
+    });
+  };
 
   const completedCount = complete ? 6 : Math.max(0, active);
   const animateLoops = inView && !reduced;
@@ -136,45 +205,56 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
         {heading}
 
         <div className="mt-4 grid min-h-0 grid-cols-[1fr_auto_1fr] items-center gap-6 xl:gap-12">
-          {/* ---------- left: small legend ---------- */}
+          {/* ---------- left: legend (click a title to jump) ---------- */}
           <div className="justify-self-end text-right">
             <ul className="space-y-3">
               {STEPS.map((s, i) => {
                 const st = stateOf(i, active, complete);
                 return (
-                  <li
-                    key={s.title}
-                    className={`flex items-center justify-end gap-3 text-[15px] transition-colors duration-500 ${
-                      st === "active"
-                        ? "font-semibold text-white"
-                        : st === "done"
-                          ? "text-white/70"
-                          : "text-white/35"
-                    }`}
-                  >
-                    {s.title}
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold transition-all duration-500 ${
+                  <li key={s.title}>
+                    <button
+                      type="button"
+                      onClick={() => goTo(i)}
+                      className={`group flex w-full items-center justify-end gap-3 text-[15px] transition-colors duration-500 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
                         st === "active"
-                          ? "scale-125 bg-white text-primary-dark"
+                          ? "font-semibold text-white"
                           : st === "done"
-                            ? "bg-white/20 text-white"
-                            : "bg-white/10 text-white/40"
+                            ? "text-white/70"
+                            : "text-white/35"
                       }`}
                     >
-                      {st === "done" ? <Check className="h-3 w-3" /> : i + 1}
-                    </span>
+                      {s.title}
+                      <span
+                        className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-500 ${
+                          st === "active"
+                            ? "scale-125 bg-white text-primary-dark"
+                            : st === "done"
+                              ? "bg-white/20 text-white"
+                              : "bg-white/10 text-white/40 group-hover:bg-white/25"
+                        }`}
+                      >
+                        {st === "done" ? <Check className="h-3 w-3" strokeWidth={3} /> : i + 1}
+                      </span>
+                    </button>
                   </li>
                 );
               })}
             </ul>
-            <motion.p
-              animate={{ opacity: complete ? 0 : active < 0 ? 1 : 0.5 }}
-              className="mt-8 flex items-center justify-end gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-white/60"
+
+            {/* scroll hint: a small mouse, not an arrow */}
+            <motion.div
+              animate={{ opacity: complete ? 0 : active < 0 ? 1 : 0.55 }}
+              className="mt-8 flex items-center justify-end gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-white/60"
             >
-              Scroll to explore
-              <ChevronDown className={`h-4 w-4 ${animateLoops ? "animate-bounce" : ""}`} />
-            </motion.p>
+              Scroll or click a step
+              <span className="relative flex h-8 w-5 justify-center rounded-full border border-white/40 pt-1.5">
+                <motion.span
+                  className="h-1.5 w-1 rounded-full bg-white/80"
+                  animate={animateLoops ? { y: [0, 10, 0], opacity: [1, 0.2, 1] } : undefined}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </span>
+            </motion.div>
           </div>
 
           {/* ---------- centre: the circle ---------- */}
@@ -236,6 +316,14 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
                 animate={animateLoops ? { rotate: -360 } : undefined}
                 transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
               />
+              {/* gold glow ring when the journey is finished */}
+              <motion.span
+                aria-hidden="true"
+                className="absolute inset-0 rounded-full border-2 border-gold/70"
+                initial={false}
+                animate={{ opacity: complete ? [0.9, 0.3, 0.9] : 0 }}
+                transition={{ duration: 2.4, repeat: complete ? Infinity : 0, ease: "easeInOut" }}
+              />
               <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-muted to-primary shadow-[0_10px_26px_rgba(0,0,0,0.4)] ring-2 ring-white/70 xl:h-16 xl:w-16">
                 <Image src={LOGO_SRC} alt="" width={36} height={36} className="h-8 w-8 object-contain xl:h-9 xl:w-9" />
               </span>
@@ -243,26 +331,16 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
                 Your Journey to{" "}
                 <span className="font-editorial font-normal italic text-gold">Influence</span>
               </p>
-              <p className="relative mt-2 font-mono text-[11px] uppercase tracking-[0.16em] text-white/60">
-                {completedCount} of 6 complete
-              </p>
-
-              <AnimatePresence>
-                {complete && (
-                  <motion.span
-                    initial={{ scale: 0, rotate: -40 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    exit={{ scale: 0 }}
-                    transition={{ type: "spring", stiffness: 220, damping: 14 }}
-                    className="absolute -top-1 right-[12%] flex h-10 w-10 items-center justify-center rounded-full bg-gold text-white shadow-[0_8px_24px_rgba(201,174,120,0.7)]"
-                  >
-                    <Check className="h-5 w-5" />
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              {/* <p
+                className={`relative mt-2 font-mono text-[11px] uppercase tracking-[0.16em] transition-colors duration-500 ${
+                  complete ? "text-gold" : "text-white/60"
+                }`}
+              >
+                {complete ? "Journey complete" : `${completedCount} of 6 complete`}
+              </p> */}
             </div>
 
-            {/* the six step indicators */}
+            {/* the six numbered circles (click to jump) */}
             {STEPS.map((s, i) => {
               const st = stateOf(i, active, complete);
               const StepIcon = s.icon;
@@ -270,41 +348,61 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
                 <div
                   key={s.title}
                   className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: `${NODES[i].x}%`, top: `${NODES[i].y}%`, width: "clamp(56px, 13%, 78px)" }}
-                  aria-current={st === "active" ? "step" : undefined}
+                  style={{ left: `${NODES[i].x}%`, top: `${NODES[i].y}%`, width: "clamp(60px, 14%, 84px)" }}
                 >
-                  {st === "active" && !reduced && (
-                    <motion.span
-                      aria-hidden="true"
-                      className="absolute inset-0 rounded-full border-2 border-white/60"
-                      animate={{ scale: [1, 1.7], opacity: [0.5, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                    />
-                  )}
-                  <motion.div
-                    animate={{ scale: st === "active" ? 1.28 : 1 }}
-                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                    className={`relative flex aspect-square w-full flex-col items-center justify-center gap-0.5 rounded-full transition-colors duration-500 ${nodeStyle[st]}`}
+                  <motion.button
+                    type="button"
+                    onClick={() => goTo(i)}
+                    aria-label={`Step ${i + 1}: ${s.title}`}
+                    aria-current={st === "active" ? "step" : undefined}
+                    whileHover={reduced ? undefined : { scale: 1.1 }}
+                    whileTap={reduced ? undefined : { scale: 0.95 }}
+                    animate={{ opacity: st === "active" ? 0 : 1 }}
+                    className={`relative flex aspect-square w-full cursor-pointer flex-col items-center justify-center gap-0.5 rounded-full transition-colors duration-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${nodeStyle[st]}`}
                   >
-                    <span className="text-[11px] font-bold leading-none tracking-wider">{pad(i + 1)}</span>
-                    {st === "done" ? (
-                      <Check className="h-5 w-5" strokeWidth={3} />
-                    ) : (
-                      <motion.span
-                        animate={
-                          st === "active" && !reduced
-                            ? { rotate: [0, -12, 12, 0], scale: [1, 1.15, 1] }
-                            : { rotate: 0, scale: 1 }
-                        }
-                        transition={{ duration: 1.2, repeat: st === "active" ? Infinity : 0, repeatDelay: 1.6 }}
-                      >
-                        <StepIcon className="h-5 w-5" />
-                      </motion.span>
+                    <span className="text-base font-bold leading-none">{pad(i + 1)}</span>
+                    <StepIcon className="h-4 w-4 opacity-80" />
+                    {st === "done" && (
+                      <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-gold text-white shadow-md">
+                        <Check className="h-3 w-3" strokeWidth={3.5} />
+                      </span>
                     )}
-                  </motion.div>
+                  </motion.button>
                 </div>
               );
             })}
+
+            {/* the logo marker: glides around the ring and sits on the active step */}
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2"
+              style={{ left: markerLeft, top: markerTop, width: "clamp(72px, 17%, 100px)" }}
+            >
+              <motion.div
+                initial={false}
+                animate={{ scale: active >= 0 ? 1 : 0, opacity: active >= 0 ? 1 : 0 }}
+                transition={{ type: "spring", stiffness: 200, damping: 16 }}
+                className="relative aspect-square w-full"
+              >
+                {!reduced && (
+                  <motion.span
+                    className="absolute inset-0 rounded-full border-2 border-white/60"
+                    animate={{ scale: [1, 1.6], opacity: [0.5, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                  />
+                )}
+                <span
+                  className={`absolute inset-0 flex items-center justify-center rounded-full ${logoBadge} ${
+                    complete ? "ring-gold" : ""
+                  }`}
+                >
+                  <Image src={LOGO_SRC} alt="" width={48} height={48} className="h-[52%] w-[52%] object-contain" />
+                </span>
+                <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white font-heading text-xs font-bold text-primary-dark shadow-lg">
+                  {pad(Math.max(0, active) + 1)}
+                </span>
+              </motion.div>
+            </motion.div>
           </div>
 
           {/* ---------- right: the active step card ---------- */}
@@ -350,7 +448,7 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
                       animate={{ opacity: 1, y: 0 }}
                       className="mt-4 flex items-center gap-2 text-sm font-semibold text-gold"
                     >
-                      <Check className="h-4 w-4" /> All six steps complete
+                      <Check className="h-4 w-4" strokeWidth={3} /> All six steps complete
                     </motion.p>
                   )}
                 </motion.div>
@@ -363,7 +461,7 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
                   className="rounded-3xl border border-dashed border-white/25 bg-white/5 p-8 text-center"
                 >
                   <p className="font-heading text-lg font-bold !text-white">Six steps to authority</p>
-                  <p className="mt-2 text-sm !text-white/70">Keep scrolling and each step will open here.</p>
+                  <p className="mt-2 text-sm !text-white/70">Keep scrolling, or click any number, and that step will open here.</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -384,13 +482,9 @@ function MobileTimeline({ reduced }: { reduced: boolean }) {
   const [active, setActive] = useState(-1);
   const [complete, setComplete] = useState(false);
 
-  // progress 0 to 1 = how far the line tip (kept at 55% of the screen) has travelled down the list
-  const { scrollYProgress } = useScroll({
-    target: boxRef,
-    offset: ["start 0.55", "end 0.55"],
-  });
-  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 26, mass: 0.4 });
-  const lineScale = reduced ? scrollYProgress : smooth;
+  const progress = useLiveProgress(boxRef, mobProgress);
+  const smooth = useSpring(progress, { stiffness: 140, damping: 26, mass: 0.4 });
+  const lineScale = reduced ? progress : smooth;
 
   // where each step's circle sits, as a fraction of the list height
   useEffect(() => {
@@ -414,8 +508,22 @@ function MobileTimeline({ reduced }: { reduced: boolean }) {
     setActive(a);
     setComplete(p >= 0.97);
   };
-  useMotionValueEvent(scrollYProgress, "change", compute);
-  useEffect(() => compute(scrollYProgress.get()), [marks]); // eslint-disable-line react-hooks/exhaustive-deps
+  useMotionValueEvent(progress, "change", compute);
+  useEffect(() => compute(progress.get()), [marks]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* tap a step: scroll so that the line tip lands just past that step */
+  const goTo = (i: number) => {
+    const el = boxRef.current;
+    if (!el || !marks.length) return;
+    const next = i < 5 ? marks[i + 1] : 0.97;
+    const target = marks[i] + Math.min(0.02, (next - marks[i]) / 3);
+    const rect = el.getBoundingClientRect();
+    const wanted = 0.55 * window.innerHeight - target * el.offsetHeight;
+    window.scrollTo({
+      top: window.scrollY + (rect.top - wanted),
+      behavior: reduced ? "auto" : "smooth",
+    });
+  };
 
   return (
     <div ref={boxRef} className="relative mx-auto mt-10 max-w-xl md:max-w-2xl">
@@ -442,11 +550,16 @@ function MobileTimeline({ reduced }: { reduced: boolean }) {
               aria-current={st === "active" ? "step" : undefined}
               className="relative pl-[4.5rem] md:pl-24"
             >
-              {/* numbered circle */}
-              <motion.span
+              {/* round numbered circle (the logo when active). Tap to jump */}
+              <motion.button
+                type="button"
+                onClick={() => goTo(i)}
+                aria-label={`Go to step ${i + 1}: ${s.title}`}
                 animate={{ scale: st === "active" ? 1.12 : 1 }}
                 transition={{ type: "spring", stiffness: 240, damping: 18 }}
-                className={`absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-full font-heading text-lg font-bold transition-colors duration-500 ${nodeStyle[st]}`}
+                className={`absolute left-0 top-0 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full font-heading text-lg font-bold transition-colors duration-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
+                  st === "active" ? logoBadge : nodeStyle[st]
+                }`}
               >
                 {st === "active" && !reduced && (
                   <motion.span
@@ -456,8 +569,24 @@ function MobileTimeline({ reduced }: { reduced: boolean }) {
                     transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
                   />
                 )}
-                {st === "done" ? <Check className="h-6 w-6" strokeWidth={3} /> : pad(i + 1)}
-              </motion.span>
+                {st === "active" ? (
+                  <>
+                    <Image src={LOGO_SRC} alt="" width={32} height={32} className="h-7 w-7 object-contain" />
+                    <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[11px] font-bold text-primary-dark shadow-md">
+                      {i + 1}
+                    </span>
+                  </>
+                ) : st === "done" ? (
+                  <>
+                    {pad(i + 1)}
+                    <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-gold text-white shadow-md">
+                      <Check className="h-3 w-3" strokeWidth={3.5} />
+                    </span>
+                  </>
+                ) : (
+                  pad(i + 1)
+                )}
+              </motion.button>
 
               {/* card */}
               <motion.div
@@ -483,7 +612,13 @@ function MobileTimeline({ reduced }: { reduced: boolean }) {
                     <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-gold">
                       Step {pad(i + 1)} of 06
                     </p>
-                    <h3 className="font-heading text-lg font-bold !text-white md:text-xl">{s.title}</h3>
+                    <button
+                      type="button"
+                      onClick={() => goTo(i)}
+                      className="text-left font-heading text-lg font-bold !text-white md:text-xl"
+                    >
+                      {s.title}
+                    </button>
                   </div>
                 </div>
                 <motion.p
@@ -509,7 +644,7 @@ function MobileTimeline({ reduced }: { reduced: boolean }) {
             transition={{ type: "spring", stiffness: 220, damping: 14 }}
             className="absolute -bottom-4 left-[27px] flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full bg-gold text-white shadow-[0_8px_24px_rgba(201,174,120,0.7)]"
           >
-            <Check className="h-5 w-5" />
+            <Check className="h-5 w-5" strokeWidth={3} />
           </motion.span>
         )}
       </AnimatePresence>
@@ -530,19 +665,17 @@ export function JourneyMap() {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/[0.07] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md">
-          <span className="h-2 w-2 rounded-full bg-gold" />
-          Our Process
-        </span>
-        <h2 className="mt-4 font-heading text-4xl font-extrabold leading-[1.1] tracking-tight !text-white md:text-5xl">
-          Our Proven{" "}
-          <span className="font-editorial font-normal italic text-gold">Process</span>
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-sm !text-white/70 sm:text-base">
-          Six clear steps from the first call to measurable growth.
-        </p>
-      </div>
+        <SectionHeadingcopy
+          eyebrow=" Our Proven Process"
+          title=" Your Journey to LinkedIn Success"
+          highlight="LinkedIn Success"
+          highlightColor="gold"
+          subtitle="Our streamlined process ensures a seamless experience from onboarding to ongoing optimization."
+          align="center"
+          darkTheme
+          className="mb-12 max-w-2xl md:mb-16"
+        />
+     
     </motion.div>
   );
 
@@ -550,7 +683,7 @@ export function JourneyMap() {
     <section
       id="process"
       aria-label="Our proven process"
-      className="relative isolate overflow-x-clip bg-gradient-to-br from-primary-dark via-primary to-bg-dark py-16 text-white md:py-24 lg:py-0"
+      className="relative isolate overflow-x-clip bg-gradient-to-br from-primary-dark via-primary to-bg-dark py-16 text-white md:py-24 lg:py-0 lg:pb-23"
     >
       <div
         aria-hidden="true"

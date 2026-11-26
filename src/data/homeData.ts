@@ -108,7 +108,7 @@ export interface Testimonial {
   company?: string;
   avatar?: string;
   rating: number;
-  resultBadge: string;
+  // resultBadge: string;
 }
 
 export const TESTIMONIALS: Testimonial[] = [
@@ -117,10 +117,11 @@ export const TESTIMONIALS: Testimonial[] = [
     quote:
       "Before working with Srihita and her team at UVOKA, I struggled to translate my vision into a strong LinkedIn presence. I knew what I stood for, but not how to show up consistently or position my brand in a way that resonated. From the very beginning, UVOKA brought clarity, strategy, and intention to the table. They helped me define a compelling brand positioning that reflects both who I am and what I stand for. The content we've built together doesn't just sound like me, it feels like me. One of our posts was even picked up by Fox Story India, and that recognition wouldn't have been possible without the sharp positioning and storytelling the team brought in. If you're looking to build not just visibility, but credibility and community, Srihita and her team at UVOKA know how to get you there.",
     author: "Sagarika Chakraborty",
-    role: "CEO Gulf & India | Times 40U40",
-    company: "IIRIS Consulting",
+    avatar:'/images/testimonials/sc.webp',
+    role: "CEO Gulf & India @IIRIS Consulting | Times 40U40",
+    // company: "IIRIS Consulting",
     rating: 5,
-    resultBadge: "Featured by Fox Story India",
+   
   },
   {
     id: "chandrashekar-d-p",
@@ -128,9 +129,9 @@ export const TESTIMONIALS: Testimonial[] = [
       "My personal brand on LinkedIn has reached great heights, thanks to the exceptional support of Team UVOKA and Srihita Vanguri. In just three months, their strategic approach helped me achieve recognition as a Favikon Top 15% LinkedIn creator in India. Their talent for understanding my voice and crafting content that is strategic, consistent, and deeply aligned with my values truly sets them apart. UVOKA's commitment to genuine, high-quality work is evident in every piece. For any founder or leader aiming to build a meaningful brand on LinkedIn, I wholeheartedly recommend UVOKA. They provide invaluable clarity and credibility.",
     author: "Chandrashekar D P, PhD",
     role: "Edupreneur, Author, TEDx Speaker & Business Coach",
-    avatar: "https://www.uvoka.in/c.webp",
+    avatar: "/images/testimonials/c.webp",
     rating: 5,
-    resultBadge: "Favikon Top 15% Creator",
+    // resultBadge: "Favikon Top 15% Creator",
   },
   {
     id: "rakeshkumar-s-bhatia",
@@ -138,9 +139,9 @@ export const TESTIMONIALS: Testimonial[] = [
       "Srihita's work with personal branding is commendable. She really understands what one should focus on. I was totally confused on what niche I should I develop my personal brand but thanks to Srihita, she not only helped me work on my niche, she helped me earn a Top Voice badge as well. Moreover, as a client, you always love to work with someone who understands the importance of streamlining the work and one who takes feedback positively. I had no problem whatsoever working with Srihita or getting updates on the project. All the posts, articles, and creatives were managed very professionally. The best part, she listens, and understands your profile, your experience, work completely and then only with her skills and talent, she will help you to uplift and stand out. I definitely recommend Srihita as the preferred Personal Branding Expert for any working professional and I wish her and UVOKA all the best.",
     author: "Rakeshkumar S Bhatia",
     role: "Helping People Build Career and Business In Commercial Real Estate",
-    avatar: "https://www.uvoka.in/rb.webp",
+    avatar: "/images/testimonials/rb.webp",
     rating: 5,
-    resultBadge: "LinkedIn Top Voice",
+    // resultBadge: "LinkedIn Top Voice",
   },
 ];
 

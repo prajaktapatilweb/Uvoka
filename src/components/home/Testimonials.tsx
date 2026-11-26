@@ -53,10 +53,10 @@ export function Testimonials() {
 
       <Container>
         <SectionHeading
-          eyebrow="Client Testimonials"
-          title="What High-Performing Founders Say"
-          italicPhrase="High-Performing Founders"
-          subtitle="Real executive leaders, category pioneers, and venture partners sharing the direct commercial impact of UVOKA's brand architecture."
+          eyebrow="Client Success Stories"
+          title="Transforming Personal Brands"
+          italicPhrase="Personal Brands"
+          subtitle="Our clients have achieved remarkable growth and recognition on LinkedIn. Here are their stories of transformation and success with UVOKA."
         />
 
         {/* Carousel Container */}
@@ -136,14 +136,14 @@ export function Testimonials() {
                 )}
 
                 <div className="flex flex-wrap items-center justify-between gap-2 pl-4 sm:pl-5">
-                  {current.company && (
+                  {/* {current.company && (
                     <span className="text-xs font-medium text-[var(--color-text-secondary)]">
                       {current.company}
                     </span>
                   )}
                   <Badge variant="gold" size="sm" className="font-semibold">
                     {current.resultBadge}
-                  </Badge>
+                  </Badge> */}
                 </div>
               </motion.div>
             </AnimatePresence>

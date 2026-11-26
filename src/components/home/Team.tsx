@@ -34,10 +34,10 @@ export function Team() {
 
       <Container>
         <SectionHeading
-          eyebrow="Collective Capabilities"
-          title="The Multi-Disciplinary Growth Guild"
-          italicPhrase="Growth Guild"
-          subtitle="Behind every founder's voice is a dedicated squad of investigative strategists, typographers, and outbound pipeline architects."
+          eyebrow="The Minds Behind UVOKA"
+          title="Meet Our Expert Team"
+          italicPhrase="Expert Team"
+          subtitle="The brilliant minds transforming LinkedIn profiles into powerful personal brands."
         />
 
         {/* 4 Creative Discipline Capability Cards with 3D Mouse Tilt */}

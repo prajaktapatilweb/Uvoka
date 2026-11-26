@@ -24,44 +24,29 @@ export function AboutPreview() {
           {/* Left Column (6 cols): Editorial Company Story */}
           <div className="lg:col-span-6 space-y-6">
             <SectionHeading
-              eyebrow="About UVOKA"
-              title="Architecting Influence for the World's Boldest Leaders"
-              italicPhrase="Architecting Influence"
+              eyebrow="Our Story"
+              title="About UVOKA"
+              italicPhrase="UVOKA"
+              subtitle="UVOKA was born from the belief that credibility deserves visibility—and the right brand can open doors no résumé ever will."
               align="left"
               className="mb-0"
             />
 
             <p className="text-base sm:text-lg text-[var(--color-text-secondary)] leading-relaxed">
-              Founded on the belief that founder conviction is the ultimate
-              competitive moat, UVOKA serves as the strategic brand architects
-              behind Tier-1 tech founders, corporate executives, and visionary
-              creators across 14 countries.
+            Founded by an alumnus of the Indian School of Business, UVOKA is a leading LinkedIn Personal branding agency helping executives, professionals and founders build unforgettable brands on LinkedIn. Our clientele ranges from C-level executives from Big4 companies to MBB Consultants to professionals like CAs and Lawyers, VCs and founders across industries like Fintech, risk management, real estate and B2B SaaS.
+
+
             </p>
 
             <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-              We reject sanitized corporate PR releases and superficial algorithmic
-              hacks. Instead, we combine deep investigative journalism, executive
-              positioning frameworks, and outbound pipeline architecture to convert
-              genuine domain expertise into commercial dominance.
-            </p>
+            Our team of LinkedIn experts, content creators, and digital strategists work together to transform your professional presence into a powerful business asset. We've generated over 50 million organic views for our clients and helped them secure speaking engagements, publications and career opportunities.
 
-            {/* Philosophy Pillars */}
-            <div className="space-y-3 pt-2">
-              {[
-                "Human-Led Craft: Zero automated AI templates or generic ghostwriting.",
-                "Direct Pipeline Attribution: Executive positioning directly tied to business revenue.",
-                "Discreet White-Glove Execution: Complete confidentiality and private portal workflows.",
-              ].map((point, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[var(--color-ivory)] border border-[var(--color-border)] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                  </div>
-                  <span className="text-xs sm:text-sm font-medium text-[var(--color-charcoal)]">
-                    {point}
-                  </span>
-                </div>
-              ))}
-            </div>
+            </p>
+                        <p className="text-sm font-editorial text-[var(--color-text-secondary)] leading-relaxed">
+
+"Let's craft a brand that speaks before you do."
+</p>
+        
 
             <div className="pt-4 flex flex-wrap items-center gap-4">
               <MagneticButton>
@@ -72,7 +57,7 @@ export function AboutPreview() {
                   icon={<ArrowRight className="w-4 h-4" />}
                   className="shadow-md"
                 >
-                  Read Full Story
+                 Reach Out To Us
                 </Button>
               </MagneticButton>
               <Button href="/founder" variant="outline" size="md">

@@ -19,6 +19,7 @@ import { Hero1 } from "@/components/home/Hero1";
 import { HeroNew } from "@/components/home/HeroNew";
 import { HeroNew1 } from "@/components/home/Hero copy";
 import { ResultsCounter1 } from "@/components/home/ResultsCounter copy";
+import { ServicesShowcase } from "@/components/home/ServicesShowcase";
 
 export default function Home() {
   return (
@@ -32,12 +33,14 @@ export default function Home() {
       <FeaturedIn />
 
       {/* ── 03. Counter Results / Achievements ── */}
-      <ResultsCounter />
+      {/* <ResultsCounter /> */}
       <ResultsCounter1/>
+      
       <FavikonCounter />
 
       {/* ── 06. Services -- Five Creative Animated Cards ── */}
-      <Services />
+      {/* <Services /> */}
+      <ServicesShowcase/>
 
       {/* ── 09. How We Work -- Interactive Journey Map ── */}
       <JourneyMap />
