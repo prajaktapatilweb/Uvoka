@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import Image from "next/image";
-import { ArrowUpRight, Mail, MapPin } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { SITE_CONFIG, SERVICES, NAV_LINKS } from "@/lib/constants";
 import { Container } from "@/components/common/Container";
 import { LinkedInIcon, InstagramIcon, TwitterXIcon } from "@/components/common/Icons";
@@ -25,24 +25,28 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-6">
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <div className="relative w-11 h-11 rounded-full overflow-hidden border border-white/20 bg-white/10 p-1">
-                <Image
-                  src="/logo/logo1.png"
-                  alt="UVOKA Logo"
-                  fill
-                  sizes="44px"
-                  className="object-contain"
-                />
-              </div>
-              <span className="font-heading font-bold text-2xl tracking-tight text-white group-hover:text-[var(--color-gold)] transition-colors">
-                {SITE_CONFIG.name}
-              </span>
+            
+              <Image
+                            src= "/images/uvokalogo1.png"
+                            alt="UVOKA Logo"
+                            width={ 44}
+                            height={ 44}
+                            priority
+                          />
+                       
+                        <div className='h-11 items-center'>
+                          <span
+                            className='font-heading text-2xl leading-11 font-bold tracking-tight transition-colors duration-300 '
+                            
+                          >
+                            {SITE_CONFIG.name}
+                          </span>
+                          </div>
+            
             </Link>
 
-            <p className="text-sm text-white/70 max-w-sm leading-relaxed">
-              Transforming high-performing founders, creators and corporate
-              leaders into influential LinkedIn brands with bespoke content,
-              authority positioning and measurable pipeline growth.
+            <p className="text-sm text-white/70 max-w-sm leading-relaxed" style={{color:'lightgray'}}>
+             Building LinkedIn legacies that lead, influence, and last. We transform professionals into thought leaders.
             </p>
 
             <div className="flex items-center gap-3 pt-2">
@@ -77,8 +81,8 @@ export function Footer() {
           </div>
 
           {/* Services Column */}
-          <div className="space-y-4">
-            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]" style={{ color: "#D2B98B" }}>
+          <div className="space-y-4 text-white">
+            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-white" style={{color:'white'}}>
               Services
             </h4>
             <ul className="space-y-2.5 text-sm text-white/70">
@@ -97,7 +101,7 @@ export function Footer() {
 
           {/* Navigation / Company Column */}
           <div className="space-y-4">
-            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]" style={{ color: "#D2B98B" }}>
+            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-white" style={{color:'white'}}>
               Company
             </h4>
             <ul className="space-y-2.5 text-sm text-white/70">
@@ -111,45 +115,41 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link
-                  href="/press"
-                  className="hover:text-white hover:translate-x-1 inline-flex items-center gap-1 transition-all"
-                >
-                  <span>Press Releases</span>
-                </Link>
-              </li>
+            
             </ul>
           </div>
 
           {/* Contact Column */}
           <div className="space-y-4">
-            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-[var(--color-gold)]" style={{ color: "#D2B98B" }}>
+            <h4 className="font-heading text-sm font-semibold tracking-wider uppercase text-white" style={{color:'white'}}>
               Get in Touch
             </h4>
             <div className="space-y-3 text-sm text-white/70">
               <a
-                href={`mailto:${SITE_CONFIG.email}`}
-                className="flex items-center gap-2 hover:text-[var(--color-gold)] transition-colors group"
+                href="mailto:srihita@uvoka.co.in"
+                className="flex items-center gap-2.5 hover:text-white transition-colors group"
               >
-                <Mail className="w-4 h-4 text-[var(--color-gold)] shrink-0" />
-                <span>{SITE_CONFIG.email}</span>
+                <Mail className="w-4 h-4 text-white/70 group-hover:text-white shrink-0 transition-colors" />
+                <span>srihita@uvoka.co.in</span>
                 <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
               </a>
-              <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-[var(--color-gold)] shrink-0 mt-0.5" />
-                <span>India · Global Client Coverage</span>
+
+              <a
+                href="tel:+917702141838"
+                className="flex items-center gap-2.5 hover:text-white transition-colors group"
+              >
+                <Phone className="w-4 h-4 text-white/70 group-hover:text-white shrink-0 transition-colors" />
+                <span>+91 7702141838</span>
+                <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </a>
+
+              <div className="flex items-start gap-2.5">
+                <MapPin className="w-4 h-4 text-white/70 shrink-0 mt-0.5" />
+                <span>Hyderabad, India</span>
               </div>
             </div>
 
-            <div className="pt-2">
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-full text-xs font-semibold bg-[var(--color-gold)] text-[var(--color-charcoal)] hover:bg-[#c4a06a] transition-all shadow-sm"
-              >
-                Schedule Consultation
-              </Link>
-            </div>
+            
           </div>
         </div>
 

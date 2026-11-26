@@ -3,11 +3,12 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Sparkles, ArrowRight, ShieldCheck, Mail } from "lucide-react";
+import { Sparkles, ArrowRight, ShieldCheck, Mail, Phone } from "lucide-react";
 import { Container } from "@/components/common/Container";
 import { Button } from "@/components/common/Button";
 import { Badge } from "@/components/common/Badge";
 import { MagneticButton } from "@/components/animations/MagneticButton";
+import { LinkedInIcon } from "@/components/common/Icons";
 import { SITE_CONFIG } from "@/lib/constants";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -81,17 +82,15 @@ export function CTA() {
         </div>
 
         <h2 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-tight tracking-tight text-balance" style={{ color: "white" }}>
-          Ready to Claim Your Category&apos;s{" "}
-          <span className="font-editorial italic font-normal text-[var(--color-gold)]">
-            Uncontested Authority?
-          </span>
+        Let's build your unforgettable brand today!
+         
         </h2>
 
-        <p className="max-w-2xl mx-auto text-base sm:text-lg text-white/80 leading-relaxed text-balance" style={{ color: "lightgray" }}>
+        {/* <p className="max-w-2xl mx-auto text-base sm:text-lg text-white/80 leading-relaxed text-balance" style={{ color: "lightgray" }}>
           Stop losing enterprise market share and top-tier talent to competitors with
           inferior products who simply communicate with more conviction. Let UVOKA architect
           your definitive LinkedIn authority.
-        </p>
+        </p> */}
 
         {/* Action Button & Contact Direct with Magnetic Physics */}
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -103,31 +102,54 @@ export function CTA() {
               icon={<ArrowRight className="w-4 h-4 text-[var(--color-charcoal)]" />}
               className="w-full sm:w-auto shadow-2xl hover:scale-105 transition-transform"
             >
-              Schedule Strategy Consultation
+             Start Your Journey
             </Button>
           </MagneticButton>
 
           <Button
-            href={`mailto:${SITE_CONFIG.email}`}
+            href='/services'
             variant="outline"
             size="lg"
             isExternal
-            icon={<Mail className="w-4 h-4" />}
+            // icon={<Mail className="w-4 h-4" />}
             className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 hover:border-white"
           >
-            Direct Confidential Email
+           Explore Services
           </Button>
         </div>
 
+        {/* Direct Contact Channels */}
+       
+
         {/* Security & Confidentiality Tag */}
         <div className="pt-6 border-t border-white/10 flex items-center justify-center gap-6 text-xs text-white/60 font-mono">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-[var(--color-gold)]" />
-            <span>100% Strict NDA Guarantee</span>
-          </div>
-          <span>•</span>
-          <span>48-Hour Executive Briefing SLA</span>
-        </div>
+         <div className="pt-2 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+          <a
+            href="mailto:srihita@uvoka.co.in"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/15 text-white/85 hover:text-white hover:bg-white/10 hover:border-white/35 transition-all text-xs sm:text-sm font-medium backdrop-blur-xs group"
+          >
+            <Mail className="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-colors" />
+            <span>srihita@uvoka.co.in</span>
+          </a>
+
+          <a
+            href="tel:+917702141838"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/15 text-white/85 hover:text-white hover:bg-white/10 hover:border-white/35 transition-all text-xs sm:text-sm font-medium backdrop-blur-xs group"
+          >
+            <Phone className="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-colors" />
+            <span>+91 7702141838</span>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/company/uvoka/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/15 text-white/85 hover:text-white hover:bg-white/10 hover:border-white/35 transition-all text-xs sm:text-sm font-medium backdrop-blur-xs group"
+          >
+            <LinkedInIcon className="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-colors" />
+            <span>LinkedIn</span>
+          </a>
+        </div></div>
       </Container>
     </section>
   );

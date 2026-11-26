@@ -179,7 +179,7 @@ export function SectionHeading({
     <div
       ref={containerRef}
       className={cn(
-        "flex flex-col w-full max-w-5xl space-y-3 md:space-y-4 mb-10 md:mb-16",
+        "flex flex-col w-full max-w-full md:max-w-4xl lg:max-w-5xl space-y-3 md:space-y-4 mb-10 md:mb-16",
         alignStyles[align],
         className
       )}
@@ -204,7 +204,7 @@ export function SectionHeading({
       <HeadingTag
         ref={headingRef}
         className={cn(
-          "whitespace-nowrap font-heading font-extrabold tracking-tight leading-[1.15] text-[clamp(1.25rem,3.4vw,3.25rem)]",
+          "font-heading font-extrabold tracking-tight leading-[1.15] text-balance whitespace-normal md:whitespace-nowrap md:text-[clamp(1.6rem,3vw,3.25rem)]",
           darkTheme ? "text-[var(--color-white)]" : "text-[var(--color-charcoal)]"
         )}
       >

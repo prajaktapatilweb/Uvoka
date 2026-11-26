@@ -1,7 +1,8 @@
 import { Hero } from "@/components/home/Hero";
 import { FeaturedIn } from "@/components/home/FeaturedIn";
 import { ResultsCounter } from "@/components/home/ResultsCounter";
-import { ClientRecognition } from "@/components/home/ClientRecognition";
+import { ClientRecognition} from "@/components/home/ClientRecognition";
+import { ClientRecognition11 } from "@/components/oldfile/ClientRecognition11";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Services } from "@/components/home/Services";
 import { SpecialOffer } from "@/components/home/SpecialOffer";
@@ -20,6 +21,7 @@ import { HeroNew } from "@/components/home/HeroNew";
 import { HeroNew1 } from "@/components/home/Hero copy";
 import { ResultsCounter1 } from "@/components/home/ResultsCounter copy";
 import { ServicesShowcase } from "@/components/home/ServicesShowcase";
+import { BlogCard } from "@/components/blogs/BlogCard";
 
 export default function Home() {
   return (
@@ -46,6 +48,7 @@ export default function Home() {
       <JourneyMap />
       {/* ── 04. Top Clients & Recognition ── */}
       <ClientRecognition />
+
 
 
       {/* ── 05. Testimonials Slider ── */}

@@ -87,7 +87,7 @@ export function BlogsPreview() {
         <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <SectionHeading
             eyebrow="Thought Leadership & Insights"
-            title="Executive Perspectives on Authority & Pipeline"
+            title="Executive Perspectives on "
             italicPhrase="Executive Perspectives"
             subtitle="Deep-dive essays and strategic teardowns on the creator economy, algorithmic distribution, and founder-led sales."
             align="left"

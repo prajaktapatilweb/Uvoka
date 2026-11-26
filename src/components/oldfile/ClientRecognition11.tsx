@@ -6,7 +6,7 @@ import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
 import { AnimatedCard } from "@/components/animations/AnimatedCard";
 
-export function ClientRecognition() {
+export function ClientRecognition11() {
   return (
     <section className="section-padding-lg bg-[var(--color-ivory)]/50 border-t border-[var(--color-border)] relative">
       <Container>

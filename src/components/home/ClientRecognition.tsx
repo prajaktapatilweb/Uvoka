@@ -19,7 +19,7 @@ export function ClientRecognition() {
             align="left"
             className="mb-0 max-w-2xl"
           />
-
+{/* 
           <Button
             href="/case-studies"
             variant="outline"
@@ -28,7 +28,7 @@ export function ClientRecognition() {
             className="self-start md:self-end"
           >
             View All Case Studies
-          </Button>
+          </Button> */}
         </div>
 
         {/* 3 Interactive Achievement Cards with 3D Tilt */}

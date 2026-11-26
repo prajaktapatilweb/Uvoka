@@ -38,10 +38,10 @@ export function FeaturedIn() {
         className="pointer-events-none absolute -left-32 -top-32 h-[380px] w-[380px] rounded-full bg-primary/20 blur-3xl"
       /> */}
       {/* thin gold line along the top edge */}
-      {/* <div
+      <div
         aria-hidden="true"
         className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent"
-      /> */}
+      />
 
       <Container  className="relative isolate overflow-hidden rounded-[10px] px-0 py-0 sm:px-0 md:px-0 lg:px-0">
         <motion.div
@@ -54,7 +54,7 @@ export function FeaturedIn() {
           animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
           transition={shouldReduceMotion ? { duration: 0 } : { duration: 10, repeat: Infinity, ease: "linear" }}
         />
-        <div className="relative z-10 m-0.5 grid grid-cols-1 items-center gap-8 rounded-[15px] bg-bg-dark p-6 sm:p-8 md:grid-cols-[minmax(220px,0.7fr)_1.3fr] md:gap-12 md:p-10">
+        <div className="relative z-10 m-0.5 grid grid-cols-1 items-center gap-8 rounded-[15px] bg-primary p-6 sm:p-8 md:grid-cols-[minmax(220px,0.7fr)_1.3fr] md:gap-12 md:p-10">
           <div>
             <h2
               id="featured-heading"

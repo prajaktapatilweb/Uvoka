@@ -32,7 +32,7 @@ export function FAQ() {
 
       <Container size="narrow" className="relative z-10">
         {/* Editorial Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-4">
+        <div className="text-center max-w-full mx-auto mb-12 sm:mb-16 space-y-4">
           <motion.div
             initial={{ opacity: 0, y: -12 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -52,11 +52,11 @@ export function FAQ() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl text-[var(--color-charcoal)] tracking-tight leading-snug text-balance"
+            className="font-heading font-bold text-nowrap text-2xl sm:text-3xl md:text-4xl text-[var(--color-charcoal)] tracking-tight leading-snug text-balance"
           >
-            Everything You Need to Know About Our{" "}
-            <span className="font-editorial italic font-normal text-[var(--color-primary)]">
-              Executive Sprints
+           Know More.
+            <span className="font-bold ml-1 text-[var(--color-primary)]">
+            Move Forward. 
             </span>
           </motion.h2>
 
@@ -84,7 +84,7 @@ export function FAQ() {
               transition: { staggerChildren: 0.1 },
             },
           }}
-          className="space-y-4 max-w-3xl mx-auto"
+          className="space-y-4 max-w-5xl mx-auto"
         >
           {FAQS.map((faq, index) => {
             const isOpen = openIndex === index;
@@ -101,7 +101,7 @@ export function FAQ() {
                     transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
                   },
                 }}
-                className={`relative rounded-2xl md:rounded-3xl border transition-all duration-300 overflow-hidden group ${
+                className={`relative rounded-[10px] md:rounded-[10px] border transition-all duration-300 overflow-hidden group ${
                   isOpen
                     ? "bg-white border-[var(--color-primary)]/40 shadow-[0_12px_36px_rgba(82,33,102,0.08)] scale-[1.005]"
                     : "bg-white/80 backdrop-blur-md border-[var(--color-border)] hover:border-[var(--color-primary)]/30 hover:shadow-[0_8px_24px_rgba(82,33,102,0.04)]"
@@ -134,9 +134,9 @@ export function FAQ() {
                       {itemNumber}
                     </span>
 
-                    <h4 className="font-heading font-bold text-base sm:text-lg text-[var(--color-charcoal)] group-hover:text-[var(--color-primary)] transition-colors leading-snug">
+                    <h5 className="font-heading font-bold text-base sm:text-lg text-[var(--color-charcoal)] group-hover:text-[var(--color-primary)] transition-colors leading-snug">
                       {faq.question}
-                    </h4>
+                    </h5>
                   </div>
 
                   {/* Smooth Rotating Toggle Button */}
@@ -187,7 +187,7 @@ export function FAQ() {
         </motion.div>
 
         {/* Executive Concierge Consultation Banner */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -217,7 +217,7 @@ export function FAQ() {
           >
             Request Private Briefing
           </Button>
-        </motion.div>
+        </motion.div> */}
       </Container>
     </section>
   );

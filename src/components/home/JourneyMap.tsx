@@ -201,7 +201,7 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
       className="relative hidden lg:block"
       style={{ height: `${DESKTOP_SCROLL_VH}vh` }}
     >
-      <div className="sticky top-0 flex h-screen flex-col justify-center pb-6 pt-24">
+      <div className="sticky top-0 flex h-screen flex-col justify-center pb-6 pt-15">
         {heading}
 
         <div className="mt-4 grid min-h-0 grid-cols-[1fr_auto_1fr] items-center gap-6 xl:gap-12">
@@ -260,12 +260,12 @@ function DesktopJourney({ heading, reduced }: { heading: React.ReactNode; reduce
           {/* ---------- centre: the circle ---------- */}
           <div
             className="relative aspect-square text-white"
-            style={{ width: "min(calc(100svh - 17rem), 44vw, 620px)" }}
+            style={{ width: "min(calc(100svh - 17rem), 44vw, 570px)" }}
           >
             {/* slow dashed orbit */}
             <motion.div
               aria-hidden="true"
-              className="pointer-events-none absolute -inset-[4%] rounded-full border border-dashed border-white/20"
+              className="pointer-events-none absolute -inset-[3%] rounded-full border border-dashed border-white/20"
               animate={animateLoops ? { rotate: 360 } : undefined}
               transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
             />
@@ -673,7 +673,7 @@ export function JourneyMap() {
           subtitle="Our streamlined process ensures a seamless experience from onboarding to ongoing optimization."
           align="center"
           darkTheme
-          className="mb-12 max-w-2xl md:mb-16"
+          
         />
      
     </motion.div>
