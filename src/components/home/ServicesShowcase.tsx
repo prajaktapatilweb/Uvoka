@@ -655,20 +655,34 @@ export function ServicesShowcase() {
 
       <Container className="relative">
         <SectionHeading
-          eyebrow="Expert Solutions"
-          title="Our Services"
-          italicPhrase="Services"
-          subtitle="Transforming LinkedIn profiles into powerful business assets through strategic branding and authentic engagement."
+          eyebrow="Our Services"
+          title="Services Built to Grow Your Authority"
+          italicPhrase="Grow Your Authority"
+          subtitle="Pick a service to see how we work and what it looks like in practice."
           className="mb-10 md:mb-14"
         />
 
         <div className="grid gap-6 lg:grid-cols-[minmax(290px,340px)_1fr] lg:gap-10">
-          {/* ================= left: vertical navigation ================= */}
-          <div className="relative [--icon-center:1.75rem] [--item-h:3.5rem] lg:[--icon-center:2.25rem] lg:[--item-h:4.5rem]">
-            {/* connecting line + active progress */}
+          {/* ================= left: navigation =================
+              phones/tablets: one horizontal row of icons only
+              desktop (lg+): vertical list with icon, number and title */}
+          <div className="relative [--icon-center:2.25rem] [--item-h:4.5rem]">
+            {/* connecting line: horizontal on phones, progress fills towards the active icon */}
             <span
               aria-hidden="true"
-              className="absolute bottom-[calc(var(--item-h)/2)] left-[var(--icon-center)] top-[calc(var(--item-h)/2)] w-px -translate-x-1/2 bg-primary/15"
+              className="absolute left-8 right-8 top-7 h-px bg-primary/15 lg:hidden"
+            >
+              <motion.span
+                className="absolute inset-y-0 left-0 w-full origin-left bg-gradient-to-r from-primary to-gold"
+                initial={false}
+                animate={{ scaleX: active / (count - 1) }}
+                transition={{ duration: reduced ? 0 : 0.5, ease }}
+              />
+            </span>
+            {/* connecting line: vertical on desktop */}
+            <span
+              aria-hidden="true"
+              className="absolute bottom-[calc(var(--item-h)/2)] left-[var(--icon-center)] top-[calc(var(--item-h)/2)] hidden w-px -translate-x-1/2 bg-primary/15 lg:block"
             >
               <motion.span
                 className="absolute inset-x-0 top-0 h-full origin-top bg-gradient-to-b from-primary to-gold"
@@ -680,10 +694,9 @@ export function ServicesShowcase() {
 
             <div
               role="tablist"
-              aria-orientation="vertical"
               aria-label="Services"
               onKeyDown={onKeyDown}
-              className="relative flex flex-col gap-2"
+              className="relative flex items-center justify-between gap-1 lg:flex-col lg:items-stretch lg:justify-start lg:gap-2"
             >
               {SERVICES_DATA.map((s, i) => {
                 const isActive = i === active;
@@ -699,40 +712,67 @@ export function ServicesShowcase() {
                     id={`service-tab-${s.id}`}
                     aria-selected={isActive}
                     aria-controls="services-panel"
+                    aria-label={s.title}
+                    title={s.title}
                     tabIndex={isActive ? 0 : -1}
                     onClick={() => setActive(i)}
                     initial={{ opacity: 0, y: reduced ? 0 : 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.5, delay: reduced ? 0 : i * 0.08, ease }}
-                    whileHover={reduced || isActive ? undefined : { x: 4 }}
-                    className={`relative z-10 flex h-[var(--item-h)] w-full items-center gap-3 rounded-2xl border pl-2 pr-4 text-left transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:pl-3 ${
+                    whileHover={reduced || isActive ? undefined : { scale: 1.06 }}
+                    className={`relative z-10 flex h-14 max-w-[4rem] flex-1 items-center justify-center gap-3 rounded-2xl border border-transparent transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:h-[var(--item-h)] lg:w-full lg:max-w-none lg:flex-none lg:justify-start lg:pl-3 lg:pr-4 lg:text-left ${
                       isActive
-                        ? "border-primary/25 bg-white shadow-[0_14px_36px_-16px_rgba(82,33,102,0.35)]"
-                        : "border-transparent hover:border-[var(--color-border)] hover:bg-white/70"
+                        ? "lg:border-primary/25 lg:bg-white lg:shadow-[0_14px_36px_-16px_rgba(82,33,102,0.35)]"
+                        : "lg:hover:border-[var(--color-border)] lg:hover:bg-white/70"
                     }`}
                   >
                     <span className="relative shrink-0">
                       {isActive && (
-                        <motion.span
-                          aria-hidden="true"
-                          className="absolute -inset-1.5 rounded-2xl bg-primary/30 blur-md"
-                          animate={reduced ? { opacity: 0.5 } : { opacity: [0.35, 0.8, 0.35] }}
-                          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-                        />
+                        <>
+                          {/* soft glow */}
+                          <motion.span
+                            aria-hidden="true"
+                            className="absolute -inset-1.5 rounded-2xl bg-primary/30 blur-md"
+                            animate={reduced ? { opacity: 0.5 } : { opacity: [0.35, 0.85, 0.35] }}
+                            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                          />
+                          {/* ripple that spreads outward so you can see which one is current */}
+                          {!reduced && (
+                            <motion.span
+                              aria-hidden="true"
+                              className="absolute inset-0 rounded-xl border-2 border-primary/60"
+                              animate={{ scale: [1, 1.55], opacity: [0.6, 0] }}
+                              transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+                            />
+                          )}
+                        </>
                       )}
-                      <span
-                        className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-colors duration-300 lg:h-12 lg:w-12 ${
+                      <motion.span
+                        animate={{ scale: isActive ? 1.1 : 1 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 18 }}
+                        className={`relative flex h-12 w-12 items-center justify-center rounded-xl transition-colors duration-300 ${
                           isActive
-                            ? "bg-gradient-to-br from-primary to-primary-dark text-white"
+                            ? "bg-gradient-to-br from-primary to-primary-dark text-white shadow-[0_10px_24px_-8px_rgba(82,33,102,0.6)]"
                             : "border border-[var(--color-border)] bg-white text-primary"
                         }`}
                       >
-                        <Icon className="h-5 w-5 lg:h-[22px] lg:w-[22px]" />
-                      </span>
+                        <motion.span
+                          className="flex"
+                          animate={
+                            isActive && !reduced
+                              ? { rotate: [0, -10, 10, 0], scale: [1, 1.12, 1] }
+                              : { rotate: 0, scale: 1 }
+                          }
+                          transition={{ duration: 1.1, repeat: isActive ? Infinity : 0, repeatDelay: 1.8 }}
+                        >
+                          <Icon className="h-[22px] w-[22px]" />
+                        </motion.span>
+                      </motion.span>
                     </span>
 
-                    <span className="min-w-0">
+                    {/* number + title: desktop only */}
+                    <span className="hidden min-w-0 lg:block">
                       <span
                         className={`block font-mono text-[10px] font-semibold tracking-[0.18em] ${
                           isActive ? "text-gold" : "text-text-muted"
@@ -741,13 +781,23 @@ export function ServicesShowcase() {
                         {s.number}
                       </span>
                       <span
-                        className={`block font-heading text-[13px] font-semibold leading-tight sm:text-sm lg:text-[15px] ${
+                        className={`block font-heading text-[15px] font-semibold leading-tight ${
                           isActive ? "text-primary-dark" : "text-charcoal/70"
                         }`}
                       >
                         {s.title}
                       </span>
                     </span>
+
+                    {/* gold marker under the active icon (phones/tablets) */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="services-active-marker"
+                        aria-hidden="true"
+                        transition={{ duration: reduced ? 0 : 0.4, ease }}
+                        className="absolute -bottom-2 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-gold lg:hidden"
+                      />
+                    )}
                   </motion.button>
                 );
               })}

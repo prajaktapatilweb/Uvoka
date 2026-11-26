@@ -11,7 +11,7 @@ import { Container } from "@/components/common/Container";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/common/Button";
 
-const BLOG_COVER_IMAGE = "/images/hero/executive-portrait.jpg";
+const BLOG_COVER_IMAGE = "/images/blogs/maincoach1.webp";
 const SLIDE_GAP = 24;
 
 /* Card shape: a white card with a real cut-out in the bottom-right corner. */

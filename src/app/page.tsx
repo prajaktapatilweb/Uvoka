@@ -22,6 +22,7 @@ import { HeroNew1 } from "@/components/home/Hero copy";
 import { ResultsCounter1 } from "@/components/home/ResultsCounter copy";
 import { ServicesShowcase } from "@/components/home/ServicesShowcase";
 import { BlogCard } from "@/components/blogs/BlogCard";
+import { FounderSection } from "@/components/home/Foundersection";
 
 export default function Home() {
   return (
@@ -66,7 +67,7 @@ export default function Home() {
 
       {/* ── 10. About Us -- Company Story, Media & Awards ── */}
       <AboutPreview />
-
+<FounderSection/>
       {/* ── 13. Our Team -- Creative Team Showcase ── */}
       <Team />
 
